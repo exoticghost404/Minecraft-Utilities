@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Download, Youtube, Twitch, Instagram, Github, ExternalLink } from 'lucide-react';
+import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Download, Youtube, Twitch, Instagram } from 'lucide-react';
 import { ChecklistView } from './components/ChecklistView';
 import { BestLoadoutsView } from './components/BestLoadoutsView';
 import { EnchantmentCalculatorView } from './components/EnchantmentCalculatorView';
@@ -132,6 +131,7 @@ const App: React.FC = () => {
   // Keyboard shortcut listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is already typing in an input
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName || '')) {
         return;
       }
@@ -155,18 +155,24 @@ const App: React.FC = () => {
     }
   };
 
+  // View Routing (Pass searchQuery to views that support deep search)
   if (view === 'checklist') return <ChecklistView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
   if (view === 'guide') return <BestLoadoutsView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
   if (view === 'tools') return <ExternalToolsView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
+  
   if (view === 'calculator') return <EnchantmentCalculatorView onBack={() => { setView('home'); setSearchQuery(''); }} />;
   if (view === 'notes') return <NotesView onBack={() => { setView('home'); setSearchQuery(''); }} />;
   if (view === 'nether') return <NetherCalculatorView onBack={() => { setView('home'); setSearchQuery(''); }} />;
 
+  // --- Deep Search Logic ---
+  
+  // 1. Tool Cards (Main Menu)
   const menuResults = MENU_ITEMS.filter(item => 
     item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // 2. Checklist Items
   const enchantResults = searchQuery.trim() ? CATEGORIES.flatMap(cat => 
     cat.groups.flatMap(g => g.items
         .filter(item => 
@@ -177,11 +183,13 @@ const App: React.FC = () => {
     )
   ) : [];
 
+  // 3. Best Loadouts
   const guideResults = searchQuery.trim() ? BEST_LOADOUTS.filter(l => 
      l.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
      l.description.toLowerCase().includes(searchQuery.toLowerCase())
   ) : [];
 
+  // 4. External Tools (Deep Search)
   const externalToolResults = searchQuery.trim() ? TOOLS.filter(t => 
     t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     t.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -192,6 +200,7 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-zinc-950 to-black text-zinc-100 relative">
       
+      {/* Install Button */}
       {deferredPrompt && (
         <button
           onClick={handleInstallClick}
@@ -212,7 +221,9 @@ const App: React.FC = () => {
           The ultimate companion for tracking progress, optimizing gear, and managing your survival world.
         </p>
 
+        {/* Global Search Bar - Enhanced Design */}
         <div className="relative max-w-2xl mx-auto z-20 group">
+            {/* Glow Effect */}
             <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 rounded-2xl blur-lg opacity-50 group-hover:opacity-100 transition duration-500" />
             
             <div className="relative flex items-center bg-zinc-900/80 backdrop-blur-xl border border-zinc-700/50 rounded-2xl shadow-2xl transition-all duration-300 group-focus-within:border-emerald-500/50 group-focus-within:ring-1 group-focus-within:ring-emerald-500/20">
@@ -243,6 +254,8 @@ const App: React.FC = () => {
       <div className="max-w-7xl w-full">
          {hasResults ? (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                
+                {/* 1. Tool Cards */}
                 {menuResults.length > 0 && (
                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {menuResults.map((item) => (
@@ -272,6 +285,7 @@ const App: React.FC = () => {
                     </div>
                 )}
 
+                {/* 2. Deep Search Results */}
                 {(enchantResults.length > 0 || guideResults.length > 0 || externalToolResults.length > 0) && (
                     <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
                         <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
@@ -279,6 +293,7 @@ const App: React.FC = () => {
                         </h3>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {/* Checklist Items matches */}
                             {enchantResults.map((item) => (
                                 <button
                                     key={`ench-${item.id}`}
@@ -299,6 +314,7 @@ const App: React.FC = () => {
                                 </button>
                             ))}
 
+                            {/* Guide Matches */}
                             {guideResults.map((item) => (
                                 <button
                                     key={`guide-${item.id}`}
@@ -319,6 +335,7 @@ const App: React.FC = () => {
                                 </button>
                             ))}
 
+                            {/* External Tool Matches */}
                             {externalToolResults.map((item) => (
                                 <button
                                     key={`ext-${item.name}`}
@@ -351,21 +368,9 @@ const App: React.FC = () => {
       </div>
 
       <footer className="mt-16 mb-8 text-center space-y-4">
-        <div className="flex flex-wrap items-center justify-center gap-4 text-zinc-500 text-sm">
-          <p>Minecraft Utility © {new Date().getFullYear()}</p>
-          <span className="hidden sm:inline opacity-20">|</span>
-          <a 
-            href="#" 
-            className="flex items-center gap-1.5 hover:text-white transition-colors"
-            onClick={(e) => {
-              e.preventDefault();
-              // You can replace this with your actual repo URL
-              window.open('https://github.com/', '_blank');
-            }}
-          >
-            <Github size={14} /> View Source <ExternalLink size={10} />
-          </a>
-        </div>
+        <p className="text-zinc-600 text-sm">
+          Minecraft Utility © {new Date().getFullYear()}
+        </p>
         <div className="flex flex-col items-center gap-3">
             <p className="text-zinc-700 text-xs flex items-center justify-center gap-1">
             Made by <span className="text-emerald-500/60 font-medium">Exoticghost404</span>
