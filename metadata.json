@@ -1,0 +1,5 @@
+{
+  "name": "Minecraft Utility",
+  "description": "A comprehensive, interactive utility for Minecraft including enchantment tracking, anvil calculator, notes, and external tools.",
+  "requestFramePermissions": []
+}
