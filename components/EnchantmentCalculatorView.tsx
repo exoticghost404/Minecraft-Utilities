@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { ArrowLeft, Calculator, Plus, Book, AlertCircle, Check, Lock, Unlock, RefreshCw, Minus, Search, Trash2, Timer, Hammer, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Calculator, Plus, Book, AlertCircle, Check, Lock, Unlock, RefreshCw, Minus, Search, Trash2, Timer, Hammer, ArrowRight, Info } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { EnchantmentItem } from '../types';
 
@@ -357,7 +357,13 @@ function getInstructions(comb: any): any[] {
         const xp = experience(cost);
         const work = Math.max(comb.L.w, comb.R.w) + 1;
         const priorPenalty = Math.pow(2, work) - 1;
-        instructions.push({ left: comb.leftDisplay, right: comb.rightDisplay, cost: cost, xp: xp, priorWork: priorPenalty });
+        instructions.push({ 
+          left: comb.leftDisplay, 
+          right: comb.rightDisplay, 
+          cost: cost, 
+          xp: xp, 
+          priorWork: priorPenalty 
+        });
     }
     return instructions;
 }
@@ -430,6 +436,40 @@ function processCalculation(itemType: string, enchants: [string, number][], mode
 
     return { item: best, instructions, maxLevels: totalLevels, maxXp: best.x };
 }
+
+/**
+ * Clean vertical list display for items and their enchantments.
+ */
+const ItemStepRenderer: React.FC<{ text: string }> = ({ text }) => {
+    const isBook = text.startsWith('Book');
+    const match = text.match(/^([^(]+)(?:\((.*)\))?$/);
+    const itemName = match?.[1].trim() || text;
+    const enchantsStr = match?.[2] || '';
+    const enchants = enchantsStr ? enchantsStr.split(',').map(s => s.trim()) : [];
+
+    return (
+        <div className="flex flex-col gap-1.5 w-full">
+            <div className="flex items-center gap-2">
+                {isBook ? (
+                    <Book size={16} className="text-blue-400" />
+                ) : (
+                    <Hammer size={16} className="text-amber-500" />
+                )}
+                <span className="font-bold text-zinc-100 text-sm tracking-tight">{itemName}</span>
+            </div>
+            {enchants.length > 0 && (
+                <div className="pl-6 space-y-0.5 border-l border-zinc-800/50 ml-2">
+                    {enchants.map((e, idx) => (
+                        <div key={idx} className="text-xs text-zinc-400 font-medium flex items-center gap-2">
+                            <div className="w-1 h-1 rounded-full bg-zinc-700" />
+                            {e}
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
 
 export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps> = ({ onBack }) => {
   const [selectedItemType, setSelectedItemType] = useState<string>(ITEM_TYPES[0]);
@@ -529,11 +569,7 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
 
   const runSolver = () => {
     if (selectedEnchants.size === 0) return;
-    
-    // Step 1: Set loading state to allow UI to render spinner
     setIsCalculating(true);
-    
-    // Step 2: Push heavy work to next event loop tick
     setTimeout(() => {
         const startTime = performance.now();
         try {
@@ -558,14 +594,18 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
         setIsCalculating(false);
         return;
     }
-    
-    // Proper Debounce to prevent lag while adjusting levels
     calcTimerRef.current = setTimeout(() => {
         runSolver();
     }, 400);
-
     return () => { if (calcTimerRef.current) clearTimeout(calcTimerRef.current); };
   }, [selectedEnchants, selectedItemType, optimizationMode]);
+
+  const finalEnchantsList = useMemo(() => {
+      if (!solution) return [];
+      const match = solution.item.display.match(/^([^(]+)(?:\((.*)\))?$/);
+      const enchantsStr = match?.[2] || '';
+      return enchantsStr ? enchantsStr.split(',').map((s: string) => s.trim()) : [];
+  }, [solution]);
 
   return (
     <div className="min-h-screen bg-zinc-950 pb-20">
@@ -589,13 +629,21 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Side: Inputs */}
         <div className="lg:col-span-4 space-y-6">
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col h-[280px]">
                 <div className="mb-3">
-                    <label className="block text-zinc-400 text-xs font-bold uppercase tracking-wider mb-2">Target Item</label>
+                    <label className="block text-zinc-400 text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-2">
+                      <Search size={12} /> Target Item
+                    </label>
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={14} />
-                        <input type="text" placeholder="Search items..." value={itemSearchQuery} onChange={(e) => setItemSearchQuery(e.target.value)} className="w-full bg-zinc-950 border border-zinc-700 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-200 outline-none focus:border-amber-500 transition-colors" />
+                        <input 
+                          type="text" 
+                          placeholder="Search items..." 
+                          value={itemSearchQuery} 
+                          onChange={(e) => setItemSearchQuery(e.target.value)} 
+                          className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-zinc-200 outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all" 
+                        />
                     </div>
                 </div>
                 <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
@@ -610,7 +658,9 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col h-[500px]">
                  <div className="flex flex-col gap-3 mb-3 shrink-0">
                     <div className="flex justify-between items-center">
-                        <label className="block text-zinc-400 text-xs font-bold uppercase tracking-wider">Enchantments</label>
+                        <label className="block text-zinc-400 text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+                           <Book size={12} /> Enchantments
+                        </label>
                         {selectedEnchants.size > 0 && (
                             <button onClick={() => { setSelectedEnchants(new Map()); setSolution(null); }} className="text-xs text-red-400 hover:text-red-300 transition-colors flex items-center gap-1"><Trash2 size={12} /> Clear</button>
                         )}
@@ -621,12 +671,12 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
                     </button>
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={14} />
-                        <input type="text" placeholder="Find enchantment..." value={enchantSearchQuery} onChange={(e) => setEnchantSearchQuery(e.target.value)} className="w-full bg-zinc-950 border border-zinc-700 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-200 outline-none focus:border-amber-500 transition-colors" />
+                        <input type="text" placeholder="Filter enchants..." value={enchantSearchQuery} onChange={(e) => setEnchantSearchQuery(e.target.value)} className="w-full bg-zinc-950 border border-zinc-700 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-200 outline-none focus:border-amber-500 transition-colors" />
                     </div>
                  </div>
                  <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-1">
                     {availableEnchantments.length === 0 ? (
-                        <div className="text-center text-zinc-600 text-sm py-4">{enchantSearchQuery ? `No match for "${enchantSearchQuery}"` : "No enchantments available."}</div>
+                        <div className="text-center text-zinc-600 text-sm py-4">No results.</div>
                     ) : (
                         availableEnchantments.map(ench => {
                             const active = selectedEnchants.has(ench.id);
@@ -656,14 +706,18 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
             </div>
         </div>
 
+        {/* Right Side: Results */}
         <div className="lg:col-span-8">
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 min-h-[600px] relative overflow-hidden flex flex-col">
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 min-h-[600px] relative overflow-hidden flex flex-col shadow-2xl">
                 <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none"><Calculator size={240} /></div>
                 <div className="relative z-10 flex-1">
-                    <div className="flex flex-col sm:flex-row justify-between items-start mb-6 gap-4">
+                    <div className="flex flex-col sm:flex-row justify-between items-start mb-8 gap-4">
                         <div>
-                            <h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2"><Book size={20} className="text-amber-500" />{solution ? 'Optimal solution found!' : 'Optimization Result'}</h2>
-                            {solution && <p className="text-xs text-zinc-500 mt-1 flex items-center gap-1"><Timer size={12} /> Calculated in {calcTime < 1 ? '< 1' : calcTime} ms</p>}
+                            <h2 className="text-xl font-bold text-zinc-100 flex items-center gap-2">
+                                <Book size={20} className="text-amber-500" />
+                                {solution ? 'Optimal calculation path' : 'Optimization Result'}
+                            </h2>
+                            {solution && <p className="text-xs text-zinc-500 mt-1 flex items-center gap-1"><Timer size={12} /> Computed in {calcTime < 1 ? '< 1' : calcTime} ms</p>}
                         </div>
                         <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 p-1 rounded-lg">
                             <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider px-2">Optimize:</span>
@@ -680,15 +734,14 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
                     )}
 
                     {solution && !isCalculating && (
-                         <div className="flex items-center justify-between bg-zinc-950/50 p-4 rounded-xl border border-zinc-800 mb-6 animate-in fade-in duration-300">
+                         <div className="flex items-center justify-between bg-zinc-950/80 p-5 rounded-xl border border-zinc-700/50 mb-8 animate-in fade-in zoom-in-95 duration-500 shadow-xl">
                             <div className="flex items-baseline gap-2">
-                                <span className="text-sm font-bold text-zinc-400 uppercase tracking-wider">Total Cost:</span>
-                                <span className="text-3xl font-bold text-emerald-400">{solution.maxLevels}</span>
-                                <span className="text-sm text-zinc-500 font-medium">Levels</span>
+                                <span className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Total Levels:</span>
+                                <span className="text-4xl font-black text-emerald-400 tabular-nums">{solution.maxLevels}</span>
                             </div>
                             <div className="text-right">
-                                <div className="text-xs text-zinc-500 uppercase tracking-wider mb-1">Raw XP Cost</div>
-                                <div className="text-lg font-mono font-bold text-zinc-300">{solution.maxXp.toLocaleString()}</div>
+                                <div className="text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-1">XP Requirement</div>
+                                <div className="text-xl font-mono font-bold text-zinc-200">{solution.maxXp.toLocaleString()}</div>
                             </div>
                          </div>
                     )}
@@ -711,42 +764,88 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
                     )}
 
                     {solution && !isCalculating && (
-                        <div className="space-y-4 pb-4">
-                            {solution.instructions.map((step: any, index: number) => (
-                                <div key={index} className="group relative bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex flex-col md:flex-row items-center gap-4 hover:border-zinc-700 transition-all animate-in slide-in-from-bottom-2 fade-in duration-300" style={{animationDelay: `${index * 50}ms`}}>
-                                    <div className="absolute top-0 left-0 -translate-x-1/3 -translate-y-1/3 w-6 h-6 bg-zinc-800 border border-zinc-600 rounded-full flex items-center justify-center text-xs font-bold text-zinc-400 shadow-lg z-10">{index + 1}</div>
-                                    <div className="flex-1 w-full grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-4 items-center">
-                                        <div className="flex items-center justify-center md:justify-end gap-2 text-zinc-200 font-medium text-center md:text-right">
-                                            <div className="order-2 md:order-1"><span>{step.left}</span></div>
-                                            <div className="order-1 md:order-2 shrink-0">{step.left.includes('(') || ITEM_TYPES.some(t => step.left.startsWith(t)) ? <Hammer size={16} className="text-amber-500" /> : <Book size={16} className="text-blue-400" />}</div>
+                        <div className="space-y-6 pb-4">
+                            {solution.instructions.map((step: any, index: number) => {
+                              return (
+                                <div key={index} className="group relative bg-zinc-900/80 border border-zinc-800/80 rounded-xl overflow-hidden hover:border-zinc-600 transition-all animate-in slide-in-from-bottom-3 fade-in duration-500" style={{animationDelay: `${index * 80}ms`}}>
+                                    <div className="flex flex-col md:flex-row md:items-stretch min-h-[100px]">
+                                        {/* Step Counter */}
+                                        <div className="w-full md:w-12 bg-zinc-800/50 flex items-center justify-center font-black text-zinc-500 border-b md:border-b-0 md:border-r border-zinc-700/50 text-xs">
+                                            {index + 1}
                                         </div>
-                                        <div className="flex justify-center text-zinc-600"><ArrowRight size={16} className="hidden md:block" /><div className="block md:hidden rotate-90"><ArrowRight size={16} /></div></div>
-                                        <div className="flex items-center justify-center md:justify-start gap-2 text-zinc-200 font-medium text-center md:text-left">
-                                            <div className="shrink-0">{step.right.includes('(') || ITEM_TYPES.some(t => step.right.startsWith(t)) ? <Hammer size={16} className="text-amber-500" /> : <Book size={16} className="text-blue-400" />}</div>
-                                            <div><span>{step.right}</span></div>
+
+                                        {/* Main Content Area */}
+                                        <div className="flex-1 p-5 grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 items-center">
+                                            <div className="w-full">
+                                                <ItemStepRenderer text={step.left} />
+                                            </div>
+                                            
+                                            <div className="flex flex-col items-center justify-center text-zinc-600 px-2">
+                                                <div className="bg-zinc-800/80 p-1.5 rounded-full border border-zinc-700 group-hover:text-emerald-400 group-hover:border-emerald-500/30 transition-all">
+                                                    <Plus size={16} />
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="w-full">
+                                                <ItemStepRenderer text={step.right} />
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="shrink-0 flex items-center gap-2 bg-zinc-950/50 px-3 py-1.5 rounded-lg border border-zinc-800/50 group-hover:border-amber-500/20 transition-colors w-full md:w-auto justify-center md:justify-start mt-2 md:mt-0">
-                                        <div className="text-right"><div className="text-xs text-zinc-500 font-mono">COST</div><div className="text-lg font-bold text-amber-400 leading-none">{step.cost}</div></div>
-                                        <div className="h-8 w-px bg-zinc-800 mx-1"></div>
-                                        <div className="text-xs text-zinc-600 flex flex-col items-center"><span>Penalty</span><span className="font-mono text-zinc-400">{step.priorWork}</span></div>
+
+                                        {/* Result/Cost Section */}
+                                        <div className="w-full md:w-32 bg-zinc-950/40 p-4 border-t md:border-t-0 md:border-l border-zinc-800/80 flex flex-col justify-center items-center gap-1 group-hover:bg-amber-500/[0.03] transition-colors">
+                                            <div className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Cost</div>
+                                            <div className="text-2xl font-black text-amber-500 tabular-nums">{step.cost}</div>
+                                            <div className="mt-1 px-2 py-0.5 rounded-full bg-zinc-800 text-[9px] font-bold text-zinc-500 border border-zinc-700 flex items-center gap-1">
+                                                <AlertCircle size={8} /> Penalty: {step.priorWork}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            ))}
-                            <div className="mt-8 p-6 bg-gradient-to-br from-emerald-900/10 to-zinc-900/50 border border-emerald-500/20 rounded-xl flex flex-col items-center text-center relative overflow-hidden">
-                                <div className="absolute inset-0 bg-emerald-500/5 blur-xl"></div>
+                              );
+                            })}
+                            
+                            <div className="mt-12 p-8 bg-gradient-to-br from-emerald-900/20 via-zinc-900/60 to-emerald-950/10 border border-emerald-500/30 rounded-2xl flex flex-col items-center text-center relative overflow-hidden shadow-2xl">
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-50"></div>
                                 <div className="relative z-10 w-full flex flex-col items-center">
-                                    <div className="text-emerald-400 font-bold text-lg mb-2 flex items-center justify-center gap-2"><Check size={20} strokeWidth={3} />Complete!</div>
-                                    <div className="text-zinc-300 text-sm max-w-lg mx-auto leading-relaxed">Your <span className="font-bold text-white">{solution.item.display}</span> is fully enchanted.</div>
-                                    <div className="inline-block mt-4 px-3 py-1 bg-black/40 rounded-full text-zinc-500 text-xs border border-white/5">Final Penalty: {Math.pow(2, solution.item.w) - 1} ({solution.item.w} uses)</div>
+                                    <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center mb-4 border border-emerald-500/40 animate-pulse">
+                                        <Check size={32} className="text-emerald-400" strokeWidth={3} />
+                                    </div>
+                                    <h3 className="text-xl font-black text-zinc-100 mb-2 tracking-tight">FULLY ENCHANTED!</h3>
+                                    <p className="text-zinc-400 text-sm max-w-lg mx-auto leading-relaxed mb-6">
+                                        Following this path will result in the most efficient {solution.item.display.split(' (')[0].toLowerCase()} merge possible.
+                                    </p>
+                                    
+                                    {/* Final Enchantment List */}
+                                    {finalEnchantsList.length > 0 && (
+                                        <div className="w-full bg-black/30 rounded-xl border border-emerald-500/20 p-4 mb-6 text-left">
+                                            <h4 className="text-[10px] font-bold text-emerald-400/70 uppercase tracking-[0.2em] mb-3 border-b border-emerald-500/10 pb-2">Final Enchantments List</h4>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
+                                                {finalEnchantsList.map((e: string, idx: number) => (
+                                                    <div key={idx} className="flex items-center gap-2 text-xs text-zinc-300 font-medium">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/40" />
+                                                        {e}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="flex flex-wrap items-center justify-center gap-3">
+                                        <div className="px-4 py-2 bg-black/40 rounded-xl text-zinc-300 text-xs border border-white/5 font-bold flex items-center gap-2">
+                                            <span className="text-zinc-500 font-medium">Final Work Penalty:</span> {Math.pow(2, solution.item.w) - 1}
+                                        </div>
+                                        <div className="px-4 py-2 bg-black/40 rounded-xl text-zinc-300 text-xs border border-white/5 font-bold flex items-center gap-2">
+                                            <span className="text-zinc-500 font-medium">Prior Uses:</span> {solution.item.w}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     )}
                 </div>
                 {solution && !isCalculating && (
-                    <div className="pt-6 mt-auto border-t border-zinc-800 flex justify-end">
-                         <button onClick={() => { setSelectedEnchants(new Map()); setSolution(null); }} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-sm text-zinc-300 transition-colors"><RefreshCw size={16} /> Start Over</button>
+                    <div className="pt-8 mt-4 border-t border-zinc-800 flex justify-end">
+                         <button onClick={() => { setSelectedEnchants(new Map()); setSolution(null); }} className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-sm font-bold text-zinc-300 transition-all border border-zinc-700/50 shadow-lg"><RefreshCw size={18} /> Start New Calculation</button>
                     </div>
                 )}
             </div>
