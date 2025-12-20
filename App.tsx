@@ -13,7 +13,7 @@ type ViewMode = 'home' | 'checklist' | 'guide' | 'calculator' | 'notes' | 'tools
 const MENU_ITEMS = [
   {
     id: 'checklist',
-    title: 'Checklist',
+    title: 'Checklst',
     description: 'Track collected enchantments and monitor progress.',
     icon: CheckSquare,
     view: 'checklist',
