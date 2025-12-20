@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { ArrowLeft, Calculator, Plus, Book, AlertCircle, Check, Lock, Unlock, RefreshCw, Minus, Search, Trash2, Timer, Hammer } from 'lucide-react';
+import { ArrowLeft, Calculator, Plus, Book, AlertCircle, Check, Lock, Unlock, RefreshCw, Minus, Search, Trash2, Timer, Hammer, ArrowRight, Info } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { EnchantmentItem } from '../types';
 
@@ -17,53 +17,68 @@ const ITEM_TYPES = [
   'Book'
 ];
 
+/**
+ * Enchantment Data with Multipliers (Sacrifice = Book)
+ * Based on https://minecraft.wiki/w/Anvil_mechanics#Enchantment_multiplier
+ */
 interface EnchantData {
     levelMax: number;
-    weight: number;
+    weight: number; // Multplier when sacrifice is a Book
     incompatible: string[];
     items: string[];
 }
 
 const ENCHANTMENT_DATA: Record<string, EnchantData> = {
+    // Armor
     protection: { levelMax: 4, weight: 1, incompatible: ["blast_protection", "fire_protection", "projectile_protection"], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
-    aqua_affinity: { levelMax: 1, weight: 2, incompatible: [], items: ["helmet", "turtle_shell"] },
-    bane_of_arthropods: { levelMax: 5, weight: 1, incompatible: ["smite", "sharpness", "density", "breach"], items: ["sword", "axe", "mace", "spear"] },
-    blast_protection: { levelMax: 4, weight: 2, incompatible: ["fire_protection", "protection", "projectile_protection"], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
-    channeling: { levelMax: 1, weight: 4, incompatible: ["riptide"], items: ["trident"] },
-    depth_strider: { levelMax: 3, weight: 2, incompatible: ["frost_walker"], items: ["boots"] },
-    efficiency: { levelMax: 5, weight: 1, incompatible: [], items: ["pickaxe", "shovel", "axe", "hoe", "shears"] },
-    feather_falling: { levelMax: 4, weight: 1, incompatible: [], items: ["boots"] },
-    fire_aspect: { levelMax: 2, weight: 2, incompatible: [], items: ["sword", "mace", "spear"] },
     fire_protection: { levelMax: 4, weight: 1, incompatible: ["blast_protection", "protection", "projectile_protection"], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
-    flame: { levelMax: 1, weight: 2, incompatible: [], items: ["bow"] },
-    fortune: { levelMax: 3, weight: 2, incompatible: ["silk_touch"], items: ["pickaxe", "shovel", "axe", "hoe"] },
+    feather_falling: { levelMax: 4, weight: 1, incompatible: [], items: ["boots"] },
+    blast_protection: { levelMax: 4, weight: 2, incompatible: ["fire_protection", "protection", "projectile_protection"], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
+    projectile_protection: { levelMax: 4, weight: 1, incompatible: ["protection", "blast_protection", "fire_protection"], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
+    respiration: { levelMax: 3, weight: 2, incompatible: [], items: ["helmet", "turtle_shell"] },
+    aqua_affinity: { levelMax: 1, weight: 2, incompatible: [], items: ["helmet", "turtle_shell"] },
+    thorns: { levelMax: 3, weight: 4, incompatible: [], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
+    depth_strider: { levelMax: 3, weight: 2, incompatible: ["frost_walker"], items: ["boots"] },
     frost_walker: { levelMax: 2, weight: 2, incompatible: ["depth_strider"], items: ["boots"] },
-    impaling: { levelMax: 5, weight: 2, incompatible: [], items: ["trident"] },
-    infinity: { levelMax: 1, weight: 4, incompatible: ["mending"], items: ["bow"] },
+    soul_speed: { levelMax: 3, weight: 4, incompatible: [], items: ["boots"] },
+    swift_sneak: { levelMax: 3, weight: 4, incompatible: [], items: ["leggings"] },
+
+    // Weapons
+    sharpness: { levelMax: 5, weight: 1, incompatible: ["bane_of_arthropods", "smite", "density", "breach"], items: ["sword", "axe", "spear"] },
+    smite: { levelMax: 5, weight: 1, incompatible: ["bane_of_arthropods", "sharpness", "density", "breach"], items: ["sword", "axe", "mace", "spear"] },
+    bane_of_arthropods: { levelMax: 5, weight: 1, incompatible: ["smite", "sharpness", "density", "breach"], items: ["sword", "axe", "mace", "spear"] },
     knockback: { levelMax: 2, weight: 1, incompatible: [], items: ["sword", "spear"] },
+    fire_aspect: { levelMax: 2, weight: 2, incompatible: [], items: ["sword", "mace", "spear"] },
     looting: { levelMax: 3, weight: 2, incompatible: [], items: ["sword", "spear"] },
-    loyalty: { levelMax: 3, weight: 1, incompatible: ["riptide"], items: ["trident"] },
+    sweeping_edge: { levelMax: 3, weight: 2, incompatible: [], items: ["sword"] },
+    
+    // Ranged
+    power: { levelMax: 5, weight: 1, incompatible: [], items: ["bow"] },
+    punch: { levelMax: 2, weight: 2, incompatible: [], items: ["bow"] },
+    flame: { levelMax: 1, weight: 2, incompatible: [], items: ["bow"] },
+    infinity: { levelMax: 1, weight: 4, incompatible: ["mending"], items: ["bow"] },
     luck_of_the_sea: { levelMax: 3, weight: 2, incompatible: [], items: ["fishing_rod"] },
     lure: { levelMax: 3, weight: 2, incompatible: [], items: ["fishing_rod"] },
-    mending: { levelMax: 1, weight: 2, incompatible: ["infinity"], items: ["helmet", "chestplate", "leggings", "boots", "pickaxe", "shovel", "axe", "sword", "hoe", "brush", "fishing_rod", "bow", "shears", "flint_and_steel", "carrot_on_a_stick", "warped_fungus_on_a_stick", "shield", "elytra", "trident", "turtle_shell", "crossbow", "mace", "spear"] },
+    loyalty: { levelMax: 3, weight: 1, incompatible: ["riptide"], items: ["trident"] },
+    impaling: { levelMax: 5, weight: 2, incompatible: [], items: ["trident"] },
+    riptide: { levelMax: 3, weight: 2, incompatible: ["channeling", "loyalty"], items: ["trident"] },
+    channeling: { levelMax: 1, weight: 4, incompatible: ["riptide"], items: ["trident"] },
     multishot: { levelMax: 1, weight: 2, incompatible: ["piercing"], items: ["crossbow"] },
     piercing: { levelMax: 4, weight: 1, incompatible: ["multishot"], items: ["crossbow"] },
-    power: { levelMax: 5, weight: 1, incompatible: [], items: ["bow"] },
-    projectile_protection: { levelMax: 4, weight: 1, incompatible: ["protection", "blast_protection", "fire_protection"], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
-    punch: { levelMax: 2, weight: 2, incompatible: [], items: ["bow"] },
     quick_charge: { levelMax: 3, weight: 1, incompatible: [], items: ["crossbow"] },
-    respiration: { levelMax: 3, weight: 2, incompatible: [], items: ["helmet", "turtle_shell"] },
-    riptide: { levelMax: 3, weight: 2, incompatible: ["channeling", "loyalty"], items: ["trident"] },
-    sharpness: { levelMax: 5, weight: 1, incompatible: ["bane_of_arthropods", "smite", "density", "breach"], items: ["sword", "axe", "spear"] },
+
+    // Tools
+    efficiency: { levelMax: 5, weight: 1, incompatible: [], items: ["pickaxe", "shovel", "axe", "hoe", "shears"] },
     silk_touch: { levelMax: 1, weight: 4, incompatible: ["fortune"], items: ["pickaxe", "shovel", "axe", "hoe"] },
-    smite: { levelMax: 5, weight: 1, incompatible: ["bane_of_arthropods", "sharpness", "density", "breach"], items: ["sword", "axe", "mace", "spear"] },
-    soul_speed: { levelMax: 3, weight: 4, incompatible: [], items: ["boots"] },
-    sweeping_edge: { levelMax: 3, weight: 2, incompatible: [], items: ["sword"] },
-    swift_sneak: { levelMax: 3, weight: 4, incompatible: [], items: ["leggings"] },
-    thorns: { levelMax: 3, weight: 4, incompatible: [], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
+    fortune: { levelMax: 3, weight: 2, incompatible: ["silk_touch"], items: ["pickaxe", "shovel", "axe", "hoe"] },
+
+    // Universal
     unbreaking: { levelMax: 3, weight: 1, incompatible: [], items: ["helmet", "chestplate", "leggings", "boots", "pickaxe", "shovel", "axe", "sword", "hoe", "brush", "fishing_rod", "bow", "shears", "flint_and_steel", "carrot_on_a_stick", "warped_fungus_on_a_stick", "shield", "elytra", "trident", "turtle_shell", "crossbow", "mace", "spear"] },
+    mending: { levelMax: 1, weight: 2, incompatible: ["infinity"], items: ["helmet", "chestplate", "leggings", "boots", "pickaxe", "shovel", "axe", "sword", "hoe", "brush", "fishing_rod", "bow", "shears", "flint_and_steel", "carrot_on_a_stick", "warped_fungus_on_a_stick", "shield", "elytra", "trident", "turtle_shell", "crossbow", "mace", "spear"] },
     curse_of_binding: { levelMax: 1, weight: 4, incompatible: [], items: ["helmet", "chestplate", "leggings", "boots", "elytra", "pumpkin", "turtle_shell"] },
     curse_of_vanishing: { levelMax: 1, weight: 4, incompatible: [], items: ["helmet", "chestplate", "leggings", "boots", "pickaxe", "shovel", "axe", "sword", "hoe", "brush", "fishing_rod", "bow", "shears", "flint_and_steel", "carrot_on_a_stick", "warped_fungus_on_a_stick", "shield", "elytra", "pumpkin", "trident", "turtle_shell", "crossbow", "mace", "spear"] },
+
+    // 1.21 Mace & Spear
     density: { levelMax: 5, weight: 1, incompatible: ["breach", "smite", "bane_of_arthropods", "sharpness"], items: ["mace"] },
     breach: { levelMax: 4, weight: 2, incompatible: ["density", "smite", "bane_of_arthropods", "sharpness"], items: ["mace"] },
     wind_burst: { levelMax: 3, weight: 2, incompatible: [], items: ["mace"] },
@@ -142,9 +157,9 @@ class item_obj {
     i: string | number;
     e: number[];
     c: any;
-    w: number;
-    l: number;
-    x: number;
+    w: number; // Work Value (Prior Penalty Uses)
+    l: number; // Accumulated Enchantment Level Value (Level Cost)
+    x: number; // Total Raw XP
     display: string;
 
     constructor(name: string | number, value: number = 0, id: number[] = [], display: string = '') {
@@ -167,7 +182,13 @@ const stripBookWrapper = (name: string): string => {
 
 class MergeEnchants extends item_obj {
     constructor(left: item_obj, right: item_obj) {
-        const merge_cost = right.l + Math.pow(2, left.w) - 1 + Math.pow(2, right.w) - 1;
+        // Minecraft Anvil Cost = Penalty(A) + Penalty(B) + Enchantment_Cost(B onto A)
+        // Item A is the 'target' (left), Item B is the 'sacrifice' (right).
+        const penaltyA = Math.pow(2, left.w) - 1;
+        const penaltyB = Math.pow(2, right.w) - 1;
+        const enchant_cost = right.l; // Cost of enchants on the sacrifice
+        
+        const merge_cost = penaltyA + penaltyB + enchant_cost;
         
         if (merge_cost > MAXIMUM_MERGE_LEVELS) {
             throw new MergeLevelsTooExpensiveError();
@@ -190,6 +211,7 @@ class MergeEnchants extends item_obj {
 
         super(left.i, new_value, left.e.concat(right.e), display);
         
+        // Prior work penalty increments by 1 use (max penalty increases)
         this.w = Math.max(left.w, right.w) + 1;
         this.x = left.x + right.x + experience(merge_cost);
         
@@ -622,7 +644,7 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
                <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
                  Anvil Calculator
                </h1>
-               <p className="text-xs text-zinc-400">Optimized DP Solver • Precise Vanilla Mechanics</p>
+               <p className="text-xs text-zinc-400">Precision DP Solver • Java 1.21 Mechanics</p>
              </div>
           </div>
         </div>
@@ -631,6 +653,7 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
       <main className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Side: Inputs */}
         <div className="lg:col-span-4 space-y-6">
+            {/* Target Item Selector with Search */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col h-[280px]">
                 <div className="mb-3">
                     <label className="block text-zinc-400 text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-2">
@@ -655,6 +678,7 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
                 </div>
             </div>
 
+            {/* Enchantment List with Search */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col h-[500px]">
                  <div className="flex flex-col gap-3 mb-3 shrink-0">
                     <div className="flex justify-between items-center">
