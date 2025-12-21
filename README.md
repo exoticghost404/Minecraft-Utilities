@@ -1,8 +1,6 @@
 # Minecraft Utility
 <img width="1920" height="1080" alt="Screenshot 2025-12-21 223917" src="https://github.com/user-attachments/assets/809cfdcd-71ed-43ab-b5e0-50d573e53fac" />
 
-Created and maintained by **Exoticghost404**.
-
 Minecraft Utility is a modern, web-based collection of tools designed to help Minecraft players plan, track, and optimize their gameplay.  
 It focuses on quality-of-life features such as enchantment planning, XP optimization, coordinate conversion, and progress tracking — all in one clean interface.
 
@@ -42,4 +40,6 @@ This Project is an active work in progress.
 The current focus is on expanding tools, improving usability, and polishing the UI.
 
 Feedback, suggestions, and feature ideas are welcome.
+
+Created and maintained by **Exoticghost404**.
 
