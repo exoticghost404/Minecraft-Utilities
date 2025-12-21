@@ -4,10 +4,6 @@
 Minecraft Utility is a modern, web-based collection of tools designed to help Minecraft players plan, track, and optimize their gameplay.  
 It focuses on quality-of-life features such as enchantment planning, XP optimization, coordinate conversion, and progress tracking — all in one clean interface.
 
-🔗 **Live Website:** https://github.com/exoticghost404/Minecraft-Utilities.git
-
-📦 **Source Code:** https://github.com/exoticghost404/Minecraft-Utilities
-
 ---
 
 ## ✨ Features
