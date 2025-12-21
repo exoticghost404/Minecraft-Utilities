@@ -25,13 +25,13 @@ It focuses on quality-of-life features such as enchantment planning, XP optimiza
   - Minimize XP costs and avoid “Too Expensive” issues
 
 - **Nether Calculator**
-  - Convert Overworld coordinates to Nether coordinates
+  - Convert Overworld coordinates to Nether coordinates and vise versa
 
 - **Notes**
   - Save coordinates, to-do lists, and ideas
   - Useful for long-term worlds and projects
 
-- **More Tools (Planned)**
+- **More Tools**
   - Seed tools, armor trims, banners
   - Block palettes
   - Command generators and more
