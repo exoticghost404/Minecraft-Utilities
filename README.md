@@ -36,3 +36,8 @@ It focuses on quality-of-life features such as enchantment planning, XP optimiza
   - Seed tools, armor trims, banners
   - Block palettes
   - Command generators and more
+
+This Project is an active work in progress.
+The current focus is on expanding tools, improving usability, and polishing the UI.
+
+Feedback, suggestions, and feature ideas are welcome.
