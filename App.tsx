@@ -218,7 +218,7 @@ const App: React.FC = () => {
           Minecraft Utility
         </h1>
         <p className="text-zinc-400 max-w-md mx-auto text-lg mb-8">
-          The ultimate companion for tracking progress, optimizing gear, and managing your survival world.
+          Your all-in-one companion for tracking progress, optimizing gear, and managing your survival world.
         </p>
 
         {/* Global Search Bar - Enhanced Design */}
