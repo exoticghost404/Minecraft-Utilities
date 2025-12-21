@@ -1,4 +1,3 @@
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/d37aa779-3372-41aa-b22d-10a8c10f1f00" />
 # Minecraft Utility
 
 Created and maintained by **Exoticghost404**.
