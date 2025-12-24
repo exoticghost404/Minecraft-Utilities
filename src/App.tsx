@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Youtube, Twitch, Instagram, Hammer, Book as BookIcon } from 'lucide-react';
+import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Youtube, Twitch, Instagram, Hammer, Book as BookIcon, Check, CheckCircle2, Circle } from 'lucide-react';
 import { ChecklistView } from './components/ChecklistView';
 import { BestLoadoutsView } from './components/BestLoadoutsView';
 import { EnchantmentCalculatorView } from './components/EnchantmentCalculatorView';
@@ -8,6 +7,7 @@ import { NotesView } from './components/NotesView';
 import { ExternalToolsView, TOOLS } from './components/ExternalToolsView';
 import { NetherCalculatorView } from './components/NetherCalculatorView';
 import { CATEGORIES, BEST_LOADOUTS } from './constants';
+import { CheckedState } from './types';
 
 type ViewMode = 'home' | 'checklist' | 'guide' | 'calculator' | 'notes' | 'tools' | 'nether';
 
@@ -113,7 +113,20 @@ const MENU_ITEMS = [
 const App: React.FC = () => {
   const [view, setView] = useState<ViewMode>('home');
   const [searchQuery, setSearchQuery] = useState('');
+  const [checkedState, setCheckedState] = useState<CheckedState>({});
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Load checklist state from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('minecraft_checklist_v1');
+    if (saved) {
+      try {
+        setCheckedState(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to load state", e);
+      }
+    }
+  }, []);
 
   // Keyboard shortcut listener for '/' to focus search
   useEffect(() => {
@@ -129,6 +142,16 @@ const App: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  const toggleEnchant = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const newState = {
+        ...checkedState,
+        [id]: !checkedState[id]
+    };
+    setCheckedState(newState);
+    localStorage.setItem('minecraft_checklist_v1', JSON.stringify(newState));
+  };
 
   if (view === 'checklist') return <ChecklistView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
   if (view === 'guide') return <BestLoadoutsView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
@@ -245,25 +268,34 @@ const App: React.FC = () => {
                         </h3>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {enchantResults.map((item) => (
-                                <button
-                                    key={`ench-${item.id}`}
-                                    onClick={() => setView('checklist')}
-                                    className="flex items-center gap-4 p-4 rounded-xl bg-[#1c1c1f] border border-zinc-800/50 hover:border-emerald-500/40 hover:bg-[#252529] transition-all text-left group shadow-sm"
-                                >
-                                    <div className="p-2.5 rounded-lg bg-zinc-900 border border-zinc-800 text-blue-400 group-hover:text-blue-300">
-                                        <BookIcon size={18} />
+                            {enchantResults.map((item) => {
+                                const isChecked = !!checkedState[item.id];
+                                return (
+                                    <div
+                                        key={`ench-${item.id}`}
+                                        className={`flex items-center gap-4 p-4 rounded-xl bg-[#1c1c1f] border transition-all text-left group shadow-sm ${isChecked ? 'border-emerald-500/40 bg-emerald-500/5' : 'border-zinc-800/50 hover:border-emerald-500/40 hover:bg-[#252529]'}`}
+                                    >
+                                        <button 
+                                            onClick={(e) => toggleEnchant(item.id, e)}
+                                            className={`p-2.5 rounded-lg border transition-all ${isChecked ? 'bg-emerald-600 border-emerald-500 text-white' : 'bg-zinc-900 border-zinc-800 text-emerald-500/50 hover:text-emerald-400'}`}
+                                            title={isChecked ? 'Mark as Uncollected' : 'Mark as Collected'}
+                                        >
+                                            {isChecked ? <CheckCircle2 size={18} /> : <Circle size={18} />}
+                                        </button>
+                                        <button 
+                                            onClick={() => setView('checklist')}
+                                            className="flex-1 text-left"
+                                        >
+                                            <div className={`text-sm font-bold mb-0.5 transition-colors ${isChecked ? 'text-zinc-400 line-through' : 'text-zinc-100 group-hover:text-white'}`}>
+                                                {item.name}
+                                            </div>
+                                            <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">
+                                                Enchantment • {item.categoryName}
+                                            </div>
+                                        </button>
                                     </div>
-                                    <div className="flex-1">
-                                        <div className="text-sm font-bold text-zinc-100 group-hover:text-white mb-0.5">
-                                            {item.name}
-                                        </div>
-                                        <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">
-                                            Enchantment • {item.categoryName}
-                                        </div>
-                                    </div>
-                                </button>
-                            ))}
+                                );
+                            })}
 
                             {guideResults.map((item) => (
                                 <button
