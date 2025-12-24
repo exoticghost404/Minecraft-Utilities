@@ -1,5 +1,5 @@
 
-import { Shield, Sword, Hammer, Globe, HardHat, Shirt, Footprints, Pickaxe, Zap, Fish, BoxSelect, Feather, Gem, Layers } from 'lucide-react';
+import { Shield, Sword, Hammer, Globe, HardHat, Shirt, Footprints, Pickaxe, Zap, Fish, BoxSelect, Feather, Layers } from 'lucide-react';
 import { Category, EnchantmentType, BestLoadout, PotionRecipe } from './types';
 
 export const CATEGORIES: Category[] = [
