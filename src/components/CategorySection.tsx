@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { Category, EnchantmentItem, CheckedState } from '../types';
+import { Category,CheckedState } from '../types';
 import { EnchantmentRow } from './EnchantmentRow';
 
 interface CategorySectionProps {
