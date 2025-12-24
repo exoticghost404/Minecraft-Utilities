@@ -1,13 +1,14 @@
 
 {
+  "id": "minecraft-utility-app",
   "name": "Minecraft Utility",
   "short_name": "MC Utility",
   "description": "The ultimate companion for tracking progress, optimizing gear, and managing your survival world.",
-  "start_url": "./index.html",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#09090b",
   "theme_color": "#10b981",
-  "orientation": "portrait",
+  "orientation": "any",
   "icons": [
     {
       "src": "https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f7e9.png",
