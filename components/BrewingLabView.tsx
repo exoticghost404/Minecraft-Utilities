@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { ArrowLeft, Search, FlaskConical, Beaker, Zap, Timer, Flame, Skull, Droplets, Sparkles, ChevronRight, Info, Clock } from 'lucide-react';
+import { ArrowLeft, Search, FlaskConical, Beaker, Zap, Timer, Flame, Droplets, Sparkles, ChevronRight, Info, Clock } from 'lucide-react';
 import { POTION_RECIPES } from '../constants';
 import { PotionRecipe } from '../types';
 
