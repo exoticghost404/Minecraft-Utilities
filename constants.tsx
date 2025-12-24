@@ -114,11 +114,11 @@ export const CATEGORIES: Category[] = [
   },
   {
     id: 'weapon',
-    name: 'General Weapons',
+    name: 'Weapons',
     icon: Sword,
     groups: [
       {
-        name: 'Sword',
+        name: 'General Weapons',
         items: [
           { 
             id: 'sharpness', 
