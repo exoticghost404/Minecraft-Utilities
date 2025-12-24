@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Youtube, Twitch, Instagram, Hammer, Book as BookIcon, Check, CheckCircle2, Circle } from 'lucide-react';
+import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Youtube, Twitch, Instagram, Hammer, CheckCircle2, Circle } from 'lucide-react';
 import { ChecklistView } from './components/ChecklistView';
 import { BestLoadoutsView } from './components/BestLoadoutsView';
 import { EnchantmentCalculatorView } from './components/EnchantmentCalculatorView';
