@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Download, Youtube, Twitch, Instagram, Hammer, Book as BookIcon } from 'lucide-react';
+import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Youtube, Twitch, Instagram, Hammer, Book as BookIcon } from 'lucide-react';
 import { ChecklistView } from './components/ChecklistView';
 import { BestLoadoutsView } from './components/BestLoadoutsView';
 import { EnchantmentCalculatorView } from './components/EnchantmentCalculatorView';
