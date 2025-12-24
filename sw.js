@@ -1,30 +1,24 @@
+const CACHE_NAME = 'mc-utility-v15';
 
-const CACHE_NAME = 'mc-util-v11-offline-final';
-
-// We must cache EVERYTHING including external CDNs for Chrome to allow installation
+// Explicitly use relative paths for the cache list
 const urlsToCache = [
   './',
-  './index.html',
-  './manifest.json',
-  './index.tsx',
-  './App.tsx',
-  './types.ts',
-  './constants.tsx',
+  'index.html',
+  'manifest.json',
+  'index.tsx',
   'https://cdn.tailwindcss.com',
-  'https://aistudiocdn.com/react@^19.2.1',
-  'https://aistudiocdn.com/react-dom@^19.2.1/',
-  'https://aistudiocdn.com/lucide-react@^0.556.0',
   'https://cdn.jsdelivr.net/gh/twitter/twemoji@latest/assets/72x72/1f7e9.png'
 ];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('PWA: Caching all assets for offline use');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache => {
+      // Add items individually so one failure doesn't break the whole cache
+      return Promise.allSettled(
+        urlsToCache.map(url => cache.add(url))
+      );
+    })
   );
 });
 
@@ -43,35 +37,29 @@ self.addEventListener('activate', event => {
   return self.clients.claim();
 });
 
+// Fetch handler is required for the browser to show the "Install App" prompt
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
     caches.match(event.request)
-      .then(cachedResponse => {
-        // Return from cache if found
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        // Otherwise try network
-        return fetch(event.request).then(networkResponse => {
-          if(!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-            return networkResponse;
+      .then(response => {
+        return response || fetch(event.request).then(fetchResponse => {
+          // If the network request fails or returns an error, just return it
+          if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
+            return fetchResponse;
           }
-
-          const responseToCache = networkResponse.clone();
+          const responseToCache = fetchResponse.clone();
           caches.open(CACHE_NAME).then(cache => {
             cache.put(event.request, responseToCache);
           });
-
-          return networkResponse;
-        }).catch(() => {
-          // If both fail and it's a navigation request, we could return index.html
-          if (event.request.mode === 'navigate') {
-            return caches.match('./index.html');
-          }
+          return fetchResponse;
         });
+      }).catch(() => {
+        // Fallback for navigation requests when offline
+        if (event.request.mode === 'navigate') {
+          return caches.match('index.html');
+        }
       })
   );
 });
