@@ -7,10 +7,9 @@ import { EnchantmentCalculatorView } from './components/EnchantmentCalculatorVie
 import { NotesView } from './components/NotesView';
 import { ExternalToolsView, TOOLS } from './components/ExternalToolsView';
 import { NetherCalculatorView } from './components/NetherCalculatorView';
-import { SkinStealerView } from './components/SkinStealerView';
 import { CATEGORIES, BEST_LOADOUTS } from './constants';
 
-type ViewMode = 'home' | 'checklist' | 'guide' | 'calculator' | 'notes' | 'tools' | 'nether' | 'skin-stealer';
+type ViewMode = 'home' | 'checklist' | 'guide' | 'calculator' | 'notes' | 'tools' | 'nether';
 
 const MENU_ITEMS = [
   {
@@ -114,55 +113,29 @@ const MENU_ITEMS = [
 const App: React.FC = () => {
   const [view, setView] = useState<ViewMode>('home');
   const [searchQuery, setSearchQuery] = useState('');
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    };
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
-
-  // Keyboard shortcut listener
+  // Keyboard shortcut listener for '/'
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName || '')) {
         return;
       }
-
       if (e.key === '/') {
         e.preventDefault();
         searchInputRef.current?.focus();
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      setDeferredPrompt(null);
-    }
-  };
-
   if (view === 'checklist') return <ChecklistView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
   if (view === 'guide') return <BestLoadoutsView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
-  if (view === 'tools') return <ExternalToolsView onBack={() => { setView('home'); setSearchQuery(''); }} onSelectInternalTool={(toolId) => setView(toolId as ViewMode)} initialSearch={searchQuery} />;
+  if (view === 'tools') return <ExternalToolsView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
   if (view === 'calculator') return <EnchantmentCalculatorView onBack={() => { setView('home'); setSearchQuery(''); }} />;
   if (view === 'notes') return <NotesView onBack={() => { setView('home'); setSearchQuery(''); }} />;
   if (view === 'nether') return <NetherCalculatorView onBack={() => { setView('home'); setSearchQuery(''); }} />;
-  if (view === 'skin-stealer') return <SkinStealerView onBack={() => { setView('tools'); setSearchQuery(''); }} />;
 
   const menuResults = MENU_ITEMS.filter(item => 
     item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -194,15 +167,6 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-zinc-950 to-black text-zinc-100 relative">
       
-      {deferredPrompt && (
-        <button
-          onClick={handleInstallClick}
-          className="fixed top-4 right-4 z-50 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 font-bold animate-in fade-in zoom-in duration-300 border border-emerald-400/30"
-        >
-          <Download size={18} /> Install App
-        </button>
-      )}
-
       <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl mt-8">
         <div className="inline-block p-4 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
           <Sparkles size={48} className="text-emerald-400" />
@@ -229,7 +193,7 @@ const App: React.FC = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <div className="mr-3 flex items-center">
+                <div className="mr-3 flex items-center justify-center">
                     <kbd 
                         onClick={() => searchInputRef.current?.focus()}
                         className="hidden md:flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-500 font-mono text-sm font-bold shadow-sm cursor-pointer hover:text-zinc-300 hover:border-zinc-600 transition-all select-none"
