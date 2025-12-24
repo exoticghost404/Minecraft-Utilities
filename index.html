@@ -48,18 +48,20 @@
     <script>
       /**
        * PWA Service Worker Registration
-       * We use new URL() to ensure sw.js is resolved against the current origin,
-       * preventing the 'origin mismatch' error in sandboxed environments.
+       * Using a simple relative path './sw.js' is the most robust method across 
+       * different hosting environments (AI Studio, GitHub Pages, etc.).
+       * It prevents 'Invalid URL' errors and 'Origin Mismatch' by letting 
+       * the browser resolve the path against the current page's domain automatically.
        */
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          const swUrl = new URL('sw.js', window.location.href).href;
-          navigator.serviceWorker.register(swUrl)
+          navigator.serviceWorker.register('./sw.js')
             .then(reg => {
               console.log('PWA Service Worker registered successfully:', reg.scope);
             })
             .catch(err => {
-              console.error('PWA Service Worker registration failed:', err.message);
+              // Graceful log if it fails in restricted environments
+              console.log('PWA Service Worker registration skipped or failed:', err.message);
             });
         });
       }
