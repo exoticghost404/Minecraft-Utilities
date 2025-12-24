@@ -7,7 +7,7 @@
     <title>Minecraft Utility</title>
     
     <!-- PWA Primary Tags -->
-    <link rel="manifest" href="./manifest.json">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#09090b">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -44,11 +44,20 @@
     <script type="module" src="./index.tsx"></script>
 
     <script>
+      /**
+       * Robust PWA Registration
+       * We use a simple relative path to allow the browser to resolve the origin correctly.
+       * This avoids 'Invalid URL' construction errors and origin mismatch issues.
+       */
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js', { scope: './' })
-            .then(reg => console.log('PWA Service Worker Active:', reg.scope))
-            .catch(err => console.error('PWA Registration failed:', err));
+          navigator.serviceWorker.register('sw.js')
+            .then(reg => {
+              console.log('PWA Service Worker registered successfully:', reg.scope);
+            })
+            .catch(err => {
+              console.error('PWA Service Worker registration failed:', err);
+            });
         });
       }
     </script>
