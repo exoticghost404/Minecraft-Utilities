@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Notebook, Plus, Trash2, Edit2, X, Save, Pin, Search, Palette, Check } from 'lucide-react';
+import { ArrowLeft, Notebook, Plus, Trash2,X, Save, Pin, Search, Check } from 'lucide-react';
 import { Note } from '../types';
 import { ConfirmationModal } from './ConfirmationModal';
 
