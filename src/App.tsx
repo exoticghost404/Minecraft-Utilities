@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Youtube, Twitch, Instagram, Hammer, CheckCircle2, Circle } from 'lucide-react';
+import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Youtube, Twitch, Instagram, Hammer, Book as BookIcon, Check, CheckCircle2, Circle, Download, Share } from 'lucide-react';
 import { ChecklistView } from './components/ChecklistView';
 import { BestLoadoutsView } from './components/BestLoadoutsView';
 import { EnchantmentCalculatorView } from './components/EnchantmentCalculatorView';
@@ -10,6 +10,16 @@ import { CATEGORIES, BEST_LOADOUTS } from './constants';
 import { CheckedState } from './types';
 
 type ViewMode = 'home' | 'checklist' | 'guide' | 'calculator' | 'notes' | 'tools' | 'nether';
+
+// Define the interface for the PWA install event
+interface BeforeInstallPromptEvent extends Event {
+  readonly platforms: string[];
+  readonly userChoice: Promise<{
+    outcome: 'accepted' | 'dismissed';
+    platform: string;
+  }>;
+  prompt(): Promise<void>;
+}
 
 const MENU_ITEMS = [
   {
@@ -114,7 +124,31 @@ const App: React.FC = () => {
   const [view, setView] = useState<ViewMode>('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [checkedState, setCheckedState] = useState<CheckedState>({});
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isStandalone, setIsStandalone] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Check if app is already installed/standalone
+  useEffect(() => {
+    const checkStandalone = () => {
+      if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone) {
+        setIsStandalone(true);
+      }
+    };
+    checkStandalone();
+    window.matchMedia('(display-mode: standalone)').addEventListener('change', checkStandalone);
+  }, []);
+
+  // Listen for PWA install prompt
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
 
   // Load checklist state from localStorage
   useEffect(() => {
@@ -142,6 +176,15 @@ const App: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
 
   const toggleEnchant = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -197,9 +240,30 @@ const App: React.FC = () => {
         <h1 className="text-4xl md:text-6xl font-black bg-gradient-to-br from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-4 tracking-tight">
           Minecraft Utility
         </h1>
-        <p className="text-zinc-400 max-w-md mx-auto text-lg mb-8">
+        <p className="text-zinc-400 max-w-md mx-auto text-lg mb-6">
           The ultimate companion for tracking progress, optimizing gear, and managing your survival world.
         </p>
+
+        {/* INSTALL BUTTON SECTION */}
+        {!isStandalone && (
+           <div className="flex flex-col items-center gap-4 mb-8">
+              {deferredPrompt ? (
+                <button 
+                  onClick={handleInstallClick}
+                  className="group relative flex items-center gap-3 px-6 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-all shadow-xl shadow-emerald-900/20 animate-bounce-subtle"
+                >
+                  <Download size={20} />
+                  <span>Get the App</span>
+                  <div className="absolute -inset-1 bg-emerald-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+              ) : (
+                <div className="text-zinc-600 text-xs flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-zinc-800" />
+                  <span>Installable via Browser Menu</span>
+                </div>
+              )}
+           </div>
+        )}
 
         <div className="relative max-w-2xl mx-auto z-20 group">
             <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 rounded-2xl blur-lg opacity-50 group-hover:opacity-100 transition duration-500" />
@@ -348,7 +412,17 @@ const App: React.FC = () => {
         )}
       </div>
 
-      <footer className="mt-16 mb-8 text-center space-y-4">
+      <footer className="mt-16 mb-8 text-center space-y-6">
+        {/* iOS Install Instructions Fallback */}
+        {!isStandalone && (
+            <div className="max-w-xs mx-auto p-4 rounded-xl bg-zinc-900/50 border border-zinc-800/50 text-[10px] text-zinc-500 flex flex-col items-center gap-2">
+                <p className="font-bold uppercase tracking-wider">Using iPhone/iPad?</p>
+                <div className="flex items-center gap-2">
+                    <span>Tap</span> <Share size={12} className="text-blue-400" /> <span>then</span> <span className="text-zinc-300 font-bold">"Add to Home Screen"</span>
+                </div>
+            </div>
+        )}
+
         <div className="flex flex-wrap items-center justify-center gap-4 text-zinc-500 text-sm">
           <p>Minecraft Utility © {new Date().getFullYear()}</p>
         </div>
@@ -387,6 +461,16 @@ const App: React.FC = () => {
             </div>
         </div>
       </footer>
+
+      <style>{`
+        @keyframes bounce-subtle {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+        .animate-bounce-subtle {
+          animation: bounce-subtle 3s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 };
