@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
 import { ArrowLeft, ExternalLink, Globe, Palette, Box, Map, Database, Smile, User, Search, FlaskConical, Circle } from 'lucide-react';
 
 interface ExternalToolsViewProps {
   onBack: () => void;
+  onSelectInternalTool?: (toolId: string) => void;
   initialSearch?: string;
 }
 
@@ -93,10 +95,24 @@ export const TOOLS = [
   }
 ];
 
-export const ExternalToolsView: React.FC<ExternalToolsViewProps> = ({ onBack, initialSearch = '' }) => {
+export const ExternalToolsView: React.FC<ExternalToolsViewProps> = ({ onBack, onSelectInternalTool, initialSearch = '' }) => {
   const [searchQuery, setSearchQuery] = useState(initialSearch);
 
   const filteredTools = TOOLS.filter(tool => 
+    tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tool.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const internalTools = [
+      {
+          id: 'skin-stealer',
+          name: 'Skin Stealer',
+          description: 'Fetch and download any player skin by username or UUID.',
+          icon: User,
+          color: 'emerald',
+          isInternal: true
+      }
+  ].filter(tool => 
     tool.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     tool.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -119,9 +135,9 @@ export const ExternalToolsView: React.FC<ExternalToolsViewProps> = ({ onBack, in
                </div>
                <div>
                  <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-                   External Tools
+                   More Tools
                  </h1>
-                 <p className="text-xs text-zinc-400">Useful websites for your survival world</p>
+                 <p className="text-xs text-zinc-400">Utilities for your survival world</p>
                </div>
             </div>
 
@@ -141,8 +157,34 @@ export const ExternalToolsView: React.FC<ExternalToolsViewProps> = ({ onBack, in
       </header>
 
       <main className="max-w-5xl mx-auto px-4">
-        {filteredTools.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Internal Utilities Section */}
+            {internalTools.map(tool => (
+                <button 
+                    key={tool.id}
+                    onClick={() => onSelectInternalTool?.(tool.id)}
+                    className="group bg-gradient-to-br from-emerald-950/20 to-zinc-900 border border-emerald-500/20 rounded-xl p-5 hover:border-emerald-500/50 hover:bg-zinc-800 transition-all flex items-start gap-4 hover:shadow-[0_0_20px_rgba(16,185,129,0.1)] hover:-translate-y-1 text-left relative overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 p-2">
+                        <span className="text-[10px] font-black bg-emerald-500 text-white px-2 py-0.5 rounded-full uppercase tracking-widest shadow-lg animate-pulse">Internal</span>
+                    </div>
+                    <div className={`p-3 rounded-lg bg-zinc-950 border border-zinc-800 shadow-inner group-hover:scale-110 transition-transform text-emerald-400`}>
+                        <tool.icon size={24} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                            <h3 className="font-bold text-zinc-100 group-hover:text-emerald-300 transition-colors">
+                                {tool.name}
+                            </h3>
+                        </div>
+                        <p className="text-sm text-zinc-400 leading-relaxed group-hover:text-zinc-300">
+                            {tool.description}
+                        </p>
+                    </div>
+                </button>
+            ))}
+
+            {/* External Links Section */}
             {filteredTools.map((tool) => {
                 const Icon = tool.icon;
                 return (
@@ -184,8 +226,9 @@ export const ExternalToolsView: React.FC<ExternalToolsViewProps> = ({ onBack, in
                     </a>
                 );
             })}
-          </div>
-        ) : (
+        </div>
+        
+        {filteredTools.length === 0 && internalTools.length === 0 && (
           <div className="text-center py-20 text-zinc-500">
             <Search size={48} className="mx-auto mb-4 opacity-20" />
             <p>No tools found for "{searchQuery}"</p>
