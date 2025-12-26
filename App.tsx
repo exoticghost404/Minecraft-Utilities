@@ -97,7 +97,7 @@ const MENU_ITEMS = [
   {
     id: 'tools',
     title: 'More Tools',
-    description: 'Alchemy lab, seed maps, armor trims, banners, and other utilities.',
+    description: 'Brewing lab, seed maps, armor trims, banners, and other utilities.',
     icon: Globe,
     view: 'tools',
     theme: {
