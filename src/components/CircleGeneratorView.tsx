@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { ArrowLeft, Circle, Maximize, Hash, Info, RotateCcw, Lock, Unlock } from 'lucide-react';
 
@@ -7,6 +8,7 @@ interface CircleGeneratorViewProps {
 
 type Mode = 'thin' | 'thick' | 'filled';
 
+// Renamed from CircleGeneratorView to PixelCircleGeneratorView to match the import in App.tsx
 export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack }) => {
   const [width, setWidth] = useState(21);
   const [height, setHeight] = useState(21);
