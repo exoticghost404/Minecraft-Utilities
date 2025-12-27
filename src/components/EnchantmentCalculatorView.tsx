@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { ArrowLeft, Calculator, Plus, Book, AlertCircle, Check, Lock, Unlock, RefreshCw, Minus, Search, Trash2, Timer, Hammer } from 'lucide-react';
 import { CATEGORIES } from '../constants';
@@ -69,7 +68,7 @@ const ENCHANTMENT_DATA: Record<string, EnchantData> = {
 
     // Tools
     efficiency: { levelMax: 5, weight: 1, incompatible: [], items: ["pickaxe", "shovel", "axe", "hoe", "shears"] },
-    silk_touch: { levelMax: 1, weight: 4, incompatible: ["fortune"], items: ["pickaxe", "shovel", "axe", "hoe"] },
+    silk_touch: { levelMax: 1, weight: 4, incompatible: ["fortune"], items: ["pickaxe", "shovel", "axe", "hoe", "shears"] },
     fortune: { levelMax: 3, weight: 2, incompatible: ["silk_touch"], items: ["pickaxe", "shovel", "axe", "hoe"] },
 
     // Universal
@@ -85,15 +84,12 @@ const ENCHANTMENT_DATA: Record<string, EnchantData> = {
     lunge: { levelMax: 3, weight: 1, incompatible: [], items: ["spear"] }
 };
 
-const STRICT_TOOL_ENCHANTS: Record<string, string[]> = {
-    'flint and steel': ['unbreaking', 'mending', 'curse_of_vanishing'],
-    'shield': ['unbreaking', 'mending', 'curse_of_vanishing'],
-    'brush': ['unbreaking', 'mending', 'curse_of_vanishing'],
-    'carrot/warped fungus stick': ['unbreaking', 'mending', 'curse_of_vanishing'],
-    'shears': ['efficiency', 'unbreaking', 'mending', 'silk_touch', 'curse_of_vanishing'],
-    'elytra': ['unbreaking', 'mending', 'curse_of_binding', 'curse_of_vanishing'],
-    'pumpkin': ['curse_of_binding', 'curse_of_vanishing'],
-    'fishing rod': ['luck_of_the_sea', 'lure', 'unbreaking', 'mending', 'curse_of_vanishing']
+const normalizeItemType = (type: string): string => {
+    const t = type.toLowerCase();
+    if (t.includes('turtle')) return 'turtle_shell';
+    if (t.includes('carrot')) return 'carrot_on_a_stick';
+    if (t.includes('flint')) return 'flint_and_steel';
+    return t;
 };
 
 const getMaxLevelNumber = (maxLevelRange?: string) => {
@@ -182,11 +178,9 @@ const stripBookWrapper = (name: string): string => {
 
 class MergeEnchants extends item_obj {
     constructor(left: item_obj, right: item_obj) {
-        // Minecraft Anvil Cost = Penalty(A) + Penalty(B) + Enchantment_Cost(B onto A)
-        // Item A is the 'target' (left), Item B is the 'sacrifice' (right).
         const penaltyA = Math.pow(2, left.w) - 1;
         const penaltyB = Math.pow(2, right.w) - 1;
-        const enchant_cost = right.l; // Cost of enchants on the sacrifice
+        const enchant_cost = right.l; 
         
         const merge_cost = penaltyA + penaltyB + enchant_cost;
         
@@ -210,11 +204,8 @@ class MergeEnchants extends item_obj {
         }
 
         super(left.i, new_value, left.e.concat(right.e), display);
-        
-        // Prior work penalty increments by 1 use (max penalty increases)
         this.w = Math.max(left.w, right.w) + 1;
         this.x = left.x + right.x + experience(merge_cost);
-        
         this.c = { 
             L: left.c, 
             R: right.c, 
@@ -231,7 +222,6 @@ function combinations<T>(set: T[], k: number): T[][] {
     if (k > set.length || k <= 0) return [];
     if (k === set.length) return [set];
     if (k === 1) return set.map(x => [x]);
-
     const combs: T[][] = [];
     for (let i = 0; i < set.length - k + 1; i++) {
         const head = set.slice(i, i + 1);
@@ -256,7 +246,6 @@ function compareCheapest(item1: item_obj, item2: item_obj): Record<number, item_
     const work2item: Record<number, item_obj> = {};
     const work1 = item1.w;
     const work2 = item2.w;
-
     if (work1 === work2) {
         const val1 = item1.l;
         const val2 = item2.l;
@@ -293,17 +282,13 @@ function removeExpensiveCandidatesFromDictionary(work2item: Record<number, item_
 function cheapestItemFromItems2(left: item_obj, right: item_obj): item_obj {
     if (right.i === 'item') return new MergeEnchants(right, left);
     if (left.i === 'item') return new MergeEnchants(left, right);
-
     let normal: MergeEnchants | null = null;
     try { normal = new MergeEnchants(left, right); } catch {}
-
     let reversed: MergeEnchants | null = null;
     try { reversed = new MergeEnchants(right, left); } catch {}
-
     if (!normal && !reversed) throw new MergeLevelsTooExpensiveError();
     if (normal && !reversed) return normal;
     if (!normal && reversed) return reversed;
-
     const best = compareCheapest(normal!, reversed!);
     return Object.values(best)[0];
 }
@@ -311,17 +296,14 @@ function cheapestItemFromItems2(left: item_obj, right: item_obj): item_obj {
 function cheapestItemsFromList(items: item_obj[]): Record<number, item_obj> {
     const argsKey = memoizeHashFromArguments(items);
     if (RESULTS_CACHE.has(argsKey)) return RESULTS_CACHE.get(argsKey)!;
-
     let work2item: Record<number, item_obj> = {};
     const count = items.length;
-
     if (count === 1) {
         const item = items[0];
         work2item[item.w] = item;
         RESULTS_CACHE.set(argsKey, work2item);
         return work2item;
     }
-
     if (count === 2) {
         try {
             const cheapest = cheapestItemFromItems2(items[0], items[1]);
@@ -330,16 +312,13 @@ function cheapestItemsFromList(items: item_obj[]): Record<number, item_obj> {
         RESULTS_CACHE.set(argsKey, work2item);
         return work2item;
     }
-
     const max_subcount = Math.floor(count / 2);
-
     for (let k = 1; k <= max_subcount; k++) {
         const subcombs = combinations(items, k);
         for (const left_subset of subcombs) {
             const right_subset = items.filter(x => !left_subset.includes(x));
             const left_res = cheapestItemsFromList(left_subset);
             const right_res = cheapestItemsFromList(right_subset);
-            
             for (const lw in left_res) {
                 const l_item = left_res[lw];
                 for (const rw in right_res) {
@@ -349,7 +328,6 @@ function cheapestItemsFromList(items: item_obj[]): Record<number, item_obj> {
                         const merged = cheapestItemFromItems2(l_item, r_item);
                         new_map[merged.w] = merged;
                     } catch { continue; }
-
                     for (const w in new_map) {
                         const new_item = new_map[w];
                         const workNum = Number(w);
@@ -364,7 +342,6 @@ function cheapestItemsFromList(items: item_obj[]): Record<number, item_obj> {
             }
         }
     }
-    
     work2item = removeExpensiveCandidatesFromDictionary(work2item);
     RESULTS_CACHE.set(argsKey, work2item);
     return work2item;
@@ -402,7 +379,6 @@ function processCalculation(itemType: string, enchants: [string, number][], mode
         obj.c = { I: id, l: obj.l, w: obj.w };
         enchant_objs.push(obj);
     });
-
     if (enchant_objs.length === 0) return null;
     let base_item: item_obj;
     const items_to_process = [...enchant_objs];
@@ -410,7 +386,6 @@ function processCalculation(itemType: string, enchants: [string, number][], mode
     items_to_process.forEach((itm, idx) => {
         if (itm.l > items_to_process[mostExpensiveIdx].l) mostExpensiveIdx = idx;
     });
-
     if (itemType === 'book') {
         const expensive = items_to_process[mostExpensiveIdx];
         const id = expensive.e[0];
@@ -428,7 +403,6 @@ function processCalculation(itemType: string, enchants: [string, number][], mode
         base_item = new item_obj('item', 0, [], formattedItemName);
         base_item.c = { I: 'item', l: 0, w: 0 };
     }
-
     if (items_to_process.length > 0) {
         const next_expensive = items_to_process[mostExpensiveIdx];
         const foundation = new MergeEnchants(base_item, next_expensive);
@@ -437,11 +411,9 @@ function processCalculation(itemType: string, enchants: [string, number][], mode
     } else {
         items_to_process.push(base_item);
     }
-
     const cheapest_map = cheapestItemsFromList(items_to_process);
     let best: item_obj | null = null;
     let min_cost = Infinity;
-
     for (const w in cheapest_map) {
         const itm = cheapest_map[w];
         const cost = mode === 'levels' ? itm.x : itm.w;
@@ -450,33 +422,23 @@ function processCalculation(itemType: string, enchants: [string, number][], mode
             best = itm;
         }
     }
-
     if (!best) return null;
     const instructions = getInstructions(best.c);
     let totalLevels = 0;
     instructions.forEach(step => totalLevels += step.cost);
-
     return { item: best, instructions, maxLevels: totalLevels, maxXp: best.x };
 }
 
-/**
- * Clean vertical list display for items and their enchantments.
- */
 const ItemStepRenderer: React.FC<{ text: string }> = ({ text }) => {
     const isBook = text.startsWith('Book');
     const match = text.match(/^([^(]+)(?:\((.*)\))?$/);
     const itemName = match?.[1].trim() || text;
     const enchantsStr = match?.[2] || '';
     const enchants = enchantsStr ? enchantsStr.split(',').map(s => s.trim()) : [];
-
     return (
         <div className="flex flex-col gap-1.5 w-full">
             <div className="flex items-center gap-2">
-                {isBook ? (
-                    <Book size={16} className="text-blue-400" />
-                ) : (
-                    <Hammer size={16} className="text-amber-500" />
-                )}
+                {isBook ? <Book size={16} className="text-blue-400" /> : <Hammer size={16} className="text-amber-500" />}
                 <span className="font-bold text-zinc-100 text-sm tracking-tight">{itemName}</span>
             </div>
             {enchants.length > 0 && (
@@ -511,51 +473,18 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
   }, [itemSearchQuery]);
 
   const availableEnchantments = useMemo(() => {
-    const enchants: EnchantmentItem[] = [];
-    const type = selectedItemType.toLowerCase();
-    const strictList = STRICT_TOOL_ENCHANTS[type];
-
-    CATEGORIES.forEach(cat => {
-      cat.groups.forEach(group => {
-        let isMatch = false;
-        const groupName = group.name.toLowerCase();
-        if (type === 'book' || cat.id === 'universal') isMatch = true;
-        if (cat.id === 'armor') {
-            if (type === groupName) isMatch = true;
-            if (['helmet','chestplate','leggings','boots','elytra','turtle shell'].includes(type) && groupName === 'general armor') isMatch = true;
-            if (type === 'turtle shell' && groupName === 'helmet') isMatch = true;
-        }
-        if (cat.id === 'weapon') {
-            if (type === 'sword' && groupName === 'sword') isMatch = true;
-            if (type === 'axe' && groupName === 'sword') isMatch = true;
-            if (type === 'bow' && groupName === 'bow') isMatch = true;
-            if (type === 'crossbow' && groupName === 'crossbow') isMatch = true;
-            if (type === 'trident' && groupName === 'trident') isMatch = true;
-            if (type === 'mace' && (groupName === 'mace' || groupName === 'sword')) isMatch = true;
-            if (type === 'spear' && (groupName === 'spear' || groupName === 'sword')) isMatch = true;
-        }
-        if (cat.id === 'tool') {
-            if (['pickaxe','axe','shovel','hoe','shears','fishing rod'].includes(type) && groupName === 'general tools') isMatch = true;
-            if (type === 'fishing rod' && groupName === 'fishing rod') isMatch = true;
-        }
-
-        if (isMatch) {
-            group.items.forEach(item => {
-                let valid = true;
-                if (strictList && !strictList.includes(item.id)) valid = false;
-                else {
-                    if (type === 'mace' && ['sharpness','knockback','looting','sweeping_edge'].includes(item.id)) valid = false;
-                    if (type === 'axe' && groupName === 'sword' && !['sharpness','smite','bane_of_arthropods'].includes(item.id)) valid = false;
-                    if (type === 'spear' && item.id === 'sweeping_edge') valid = false;
-                }
-                if (valid) enchants.push(item);
-            });
-        }
-      });
+    const typeKey = normalizeItemType(selectedItemType);
+    const allChecklistItems = CATEGORIES.flatMap(cat => cat.groups.flatMap(g => g.items));
+    
+    const matchedEnchants = allChecklistItems.filter(item => {
+        const data = ENCHANTMENT_DATA[item.id];
+        if (!data) return false;
+        if (typeKey === 'book') return true;
+        return data.items.includes(typeKey);
     });
 
     const unique = new Map();
-    enchants.forEach(e => unique.set(e.id, e));
+    matchedEnchants.forEach(e => unique.set(e.id, e));
     return Array.from(unique.values()).filter(e => e.name.toLowerCase().includes(enchantSearchQuery.toLowerCase()));
   }, [selectedItemType, enchantSearchQuery]);
 
@@ -651,9 +580,7 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Side: Inputs */}
         <div className="lg:col-span-4 space-y-6">
-            {/* Target Item Selector with Search */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col h-[280px]">
                 <div className="mb-3">
                     <label className="block text-zinc-400 text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-2">
@@ -678,7 +605,6 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
                 </div>
             </div>
 
-            {/* Enchantment List with Search */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 shadow-sm flex flex-col h-[500px]">
                  <div className="flex flex-col gap-3 mb-3 shrink-0">
                     <div className="flex justify-between items-center">
@@ -730,7 +656,6 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
             </div>
         </div>
 
-        {/* Right Side: Results */}
         <div className="lg:col-span-8">
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 min-h-[600px] relative overflow-hidden flex flex-col shadow-2xl">
                 <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none"><Calculator size={240} /></div>
@@ -789,33 +714,25 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
 
                     {solution && !isCalculating && (
                         <div className="space-y-6 pb-4">
-                            {solution.instructions.map((step: any, index: number) => {
-                              return (
+                            {solution.instructions.map((step: any, index: number) => (
                                 <div key={index} className="group relative bg-zinc-900/80 border border-zinc-800/80 rounded-xl overflow-hidden hover:border-zinc-600 transition-all animate-in slide-in-from-bottom-3 fade-in duration-500" style={{animationDelay: `${index * 80}ms`}}>
                                     <div className="flex flex-col md:flex-row md:items-stretch min-h-[100px]">
-                                        {/* Step Counter */}
                                         <div className="w-full md:w-12 bg-zinc-800/50 flex items-center justify-center font-black text-zinc-500 border-b md:border-b-0 md:border-r border-zinc-700/50 text-xs">
                                             {index + 1}
                                         </div>
-
-                                        {/* Main Content Area */}
                                         <div className="flex-1 p-5 grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 items-center">
                                             <div className="w-full">
                                                 <ItemStepRenderer text={step.left} />
                                             </div>
-                                            
                                             <div className="flex flex-col items-center justify-center text-zinc-600 px-2">
                                                 <div className="bg-zinc-800/80 p-1.5 rounded-full border border-zinc-700 group-hover:text-emerald-400 group-hover:border-emerald-500/30 transition-all">
                                                     <Plus size={16} />
                                                 </div>
                                             </div>
-                                            
                                             <div className="w-full">
                                                 <ItemStepRenderer text={step.right} />
                                             </div>
                                         </div>
-
-                                        {/* Result/Cost Section */}
                                         <div className="w-full md:w-32 bg-zinc-950/40 p-4 border-t md:border-t-0 md:border-l border-zinc-800/80 flex flex-col justify-center items-center gap-1 group-hover:bg-amber-500/[0.03] transition-colors">
                                             <div className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Cost</div>
                                             <div className="text-2xl font-black text-amber-500 tabular-nums">{step.cost}</div>
@@ -825,9 +742,7 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
                                         </div>
                                     </div>
                                 </div>
-                              );
-                            })}
-                            
+                            ))}
                             <div className="mt-12 p-8 bg-gradient-to-br from-emerald-900/20 via-zinc-900/60 to-emerald-950/10 border border-emerald-500/30 rounded-2xl flex flex-col items-center text-center relative overflow-hidden shadow-2xl">
                                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-emerald-500 to-transparent opacity-50"></div>
                                 <div className="relative z-10 w-full flex flex-col items-center">
@@ -836,10 +751,8 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
                                     </div>
                                     <h3 className="text-xl font-black text-zinc-100 mb-2 tracking-tight">FULLY ENCHANTED!</h3>
                                     <p className="text-zinc-400 text-sm max-w-lg mx-auto leading-relaxed mb-6">
-                                        Following this path will result in the most efficient {solution.item.display.split(' (')[0].toLowerCase()} merge possible.
+                                        Following this path will result in the most efficient merge possible.
                                     </p>
-                                    
-                                    {/* Final Enchantment List */}
                                     {finalEnchantsList.length > 0 && (
                                         <div className="w-full bg-black/30 rounded-xl border border-emerald-500/20 p-4 mb-6 text-left">
                                             <h4 className="text-[10px] font-bold text-emerald-400/70 uppercase tracking-[0.2em] mb-3 border-b border-emerald-500/10 pb-2">Final Enchantments List</h4>
@@ -853,7 +766,6 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
                                             </div>
                                         </div>
                                     )}
-
                                     <div className="flex flex-wrap items-center justify-center gap-3">
                                         <div className="px-4 py-2 bg-black/40 rounded-xl text-zinc-300 text-xs border border-white/5 font-bold flex items-center gap-2">
                                             <span className="text-zinc-500 font-medium">Final Work Penalty:</span> {Math.pow(2, solution.item.w) - 1}
