@@ -160,7 +160,7 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
                <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent tracking-tight">
                  Pixel Circle Generator
                </h1>
-               <p className="text-xs text-zinc-400 uppercase tracking-widest font-bold">Advanced Architectural Blueprint</p>
+               <p className="text-xs text-zinc-400">Advanced Architectural Blueprint</p>
              </div>
           </div>
         </div>
