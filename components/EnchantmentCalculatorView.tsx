@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { ArrowLeft, Calculator, Plus, Book, AlertCircle, Check, Lock, Unlock, RefreshCw, Minus, Search, Trash2, Timer, Hammer } from 'lucide-react';
+import { ArrowLeft, Calculator, Plus, Book, AlertCircle, Check, Lock, Unlock, RefreshCw, Minus, Search, Trash2, Timer, Hammer, ArrowRight, Info } from 'lucide-react';
 import { CATEGORIES } from '../constants';
 import { EnchantmentItem } from '../types';
 
