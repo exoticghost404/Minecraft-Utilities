@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft, ExternalLink, Globe, Palette, Box, Map, Database, Smile, User, Search, FlaskConical, Circle } from 'lucide-react';
 
@@ -6,6 +5,7 @@ interface ExternalToolsViewProps {
   onBack: () => void;
   initialSearch?: string;
   onOpenBrewing?: () => void;
+  onOpenCircle?: () => void;
 }
 
 export const TOOLS = [
@@ -15,6 +15,13 @@ export const TOOLS = [
     description: 'NATIVE: Interactive potion sequence builder for Minecraft 1.21 including trial potions.',
     icon: FlaskConical,
     color: 'cyan'
+  },
+  {
+    name: 'Pixel Circle Generator',
+    internal: true,
+    description: 'NATIVE: Create perfect circular and elliptical blueprints for your Minecraft builds.',
+    icon: Circle,
+    color: 'indigo'
   },
   {
     name: 'Chunkbase',
@@ -80,13 +87,6 @@ export const TOOLS = [
     color: 'yellow'
   },
   {
-    name: 'Pixel Circle Generator',
-    url: 'https://donatstudios.com/PixelCircleGenerator',
-    description: 'Generate pixelated circles and ovals for building guides.',
-    icon: Circle,
-    color: 'indigo'
-  },
-  {
     name: 'Modrinth',
     url: 'https://modrinth.com/',
     description: 'Open source modding platform for mods, plugins, and resource packs.',
@@ -95,7 +95,7 @@ export const TOOLS = [
   }
 ];
 
-export const ExternalToolsView: React.FC<ExternalToolsViewProps> = ({ onBack, initialSearch = '', onOpenBrewing }) => {
+export const ExternalToolsView: React.FC<ExternalToolsViewProps> = ({ onBack, initialSearch = '', onOpenBrewing, onOpenCircle }) => {
   const [searchQuery, setSearchQuery] = useState(initialSearch);
 
   const filteredTools = TOOLS.filter(tool => 
@@ -190,8 +190,11 @@ export const ExternalToolsView: React.FC<ExternalToolsViewProps> = ({ onBack, in
                     return (
                         <button 
                             key={tool.name}
-                            onClick={() => tool.name === 'Brewing Lab' && onOpenBrewing?.()}
-                            className="text-left group bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-cyan-500/50 hover:bg-cyan-500/5 transition-all hover:shadow-lg hover:-translate-y-1 w-full"
+                            onClick={() => {
+                                if (tool.name === 'Brewing Lab') onOpenBrewing?.();
+                                if (tool.name === 'Pixel Circle Generator') onOpenCircle?.();
+                            }}
+                            className="text-left group bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all hover:shadow-lg hover:-translate-y-1 w-full"
                         >
                             {cardContent}
                         </button>
