@@ -6,6 +6,7 @@ interface ExternalToolsViewProps {
   onBack: () => void;
   initialSearch?: string;
   onOpenBrewing?: () => void;
+  onOpenCircleGen?: () => void;
 }
 
 export const TOOLS = [
@@ -15,6 +16,13 @@ export const TOOLS = [
     description: 'NATIVE: Interactive potion sequence builder for Minecraft 1.21 including trial potions.',
     icon: FlaskConical,
     color: 'cyan'
+  },
+  {
+    name: 'Pixel Circle Generator',
+    internal: true,
+    description: 'NATIVE: Build perfect circles and ellipses for your Minecraft megastructures.',
+    icon: Circle,
+    color: 'indigo'
   },
   {
     name: 'Chunkbase',
@@ -80,13 +88,6 @@ export const TOOLS = [
     color: 'yellow'
   },
   {
-    name: 'Pixel Circle Generator',
-    url: 'https://donatstudios.com/PixelCircleGenerator',
-    description: 'Generate pixelated circles and ovals for building guides.',
-    icon: Circle,
-    color: 'indigo'
-  },
-  {
     name: 'Modrinth',
     url: 'https://modrinth.com/',
     description: 'Open source modding platform for mods, plugins, and resource packs.',
@@ -95,7 +96,7 @@ export const TOOLS = [
   }
 ];
 
-export const ExternalToolsView: React.FC<ExternalToolsViewProps> = ({ onBack, initialSearch = '', onOpenBrewing }) => {
+export const ExternalToolsView: React.FC<ExternalToolsViewProps> = ({ onBack, initialSearch = '', onOpenBrewing, onOpenCircleGen }) => {
   const [searchQuery, setSearchQuery] = useState(initialSearch);
 
   const filteredTools = TOOLS.filter(tool => 
@@ -150,7 +151,7 @@ export const ExternalToolsView: React.FC<ExternalToolsViewProps> = ({ onBack, in
                 const isInternal = 'internal' in tool;
                 
                 const cardContent = (
-                    <div className="flex items-start gap-4 h-full relative w-full">
+                    <div className="flex items-start gap-4 h-full relative w-full text-left">
                         <div className={`
                             p-3 rounded-lg bg-zinc-950 border border-zinc-800 shadow-inner group-hover:scale-110 transition-transform shrink-0
                             ${tool.color === 'emerald' ? 'text-emerald-400' : ''}
@@ -190,8 +191,11 @@ export const ExternalToolsView: React.FC<ExternalToolsViewProps> = ({ onBack, in
                     return (
                         <button 
                             key={tool.name}
-                            onClick={() => tool.name === 'Brewing Lab' && onOpenBrewing?.()}
-                            className="text-left group bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-cyan-500/50 hover:bg-cyan-500/5 transition-all hover:shadow-lg hover:-translate-y-1 w-full"
+                            onClick={() => {
+                                if (tool.name === 'Brewing Lab') onOpenBrewing?.();
+                                if (tool.name === 'Pixel Circle Generator') onOpenCircleGen?.();
+                            }}
+                            className="text-left group bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all hover:shadow-lg hover:-translate-y-1 w-full"
                         >
                             {cardContent}
                         </button>
