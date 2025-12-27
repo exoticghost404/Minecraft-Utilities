@@ -8,9 +8,10 @@ import { ExternalToolsView, TOOLS } from './components/ExternalToolsView';
 import { NetherCalculatorView } from './components/NetherCalculatorView';
 import { BrewingLabView } from './components/BrewingLabView';
 import { SettingsView } from './components/SettingsView';
+import { PixelCircleGeneratorView } from './components/PixelCircleGeneratorView';
 import { CATEGORIES, BEST_LOADOUTS, POTION_RECIPES } from './constants';
 
-type ViewMode = 'home' | 'checklist' | 'guide' | 'calculator' | 'notes' | 'tools' | 'nether' | 'brewing' | 'settings';
+type ViewMode = 'home' | 'checklist' | 'guide' | 'calculator' | 'notes' | 'tools' | 'nether' | 'brewing' | 'settings' | 'circle';
 
 const MENU_ITEMS = [
   {
@@ -147,8 +148,9 @@ const App: React.FC = () => {
 
   if (view === 'checklist') return <ChecklistView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
   if (view === 'guide') return <BestLoadoutsView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
-  if (view === 'tools') return <ExternalToolsView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} onOpenBrewing={() => setView('brewing')} />;
+  if (view === 'tools') return <ExternalToolsView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} onOpenBrewing={() => setView('brewing')} onOpenCircle={() => setView('circle')} />;
   if (view === 'brewing') return <BrewingLabView onBack={() => { setView('tools'); setSearchQuery(''); }} />;
+  if (view === 'circle') return <PixelCircleGeneratorView onBack={() => { setView('tools'); setSearchQuery(''); }} />;
   if (view === 'settings') return <SettingsView onBack={() => { setView('home'); setSearchQuery(''); }} />;
   if (view === 'calculator') return <EnchantmentCalculatorView onBack={() => { setView('home'); setSearchQuery(''); }} />;
   if (view === 'notes') return <NotesView onBack={() => { setView('home'); setSearchQuery(''); }} />;
@@ -291,7 +293,14 @@ const App: React.FC = () => {
                                 </button>
                             ))}
                             {externalToolResults.map((item) => (
-                                <button key={`ext-${item.name}`} onClick={() => item.internal ? setView('brewing') : window.open(item.url, '_blank')} className="flex items-center gap-3 p-3 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-indigo-500/50 hover:bg-zinc-900 transition-all text-left group">
+                                <button key={`ext-${item.name}`} onClick={() => {
+                                  if (item.internal) {
+                                    if (item.name === 'Brewing Lab') setView('brewing');
+                                    if (item.name === 'Pixel Circle Generator') setView('circle');
+                                  } else {
+                                    window.open(item.url, '_blank');
+                                  }
+                                }} className="flex items-center gap-3 p-3 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-indigo-500/50 hover:bg-zinc-900 transition-all text-left group">
                                     <div className="p-2 rounded bg-zinc-900 border border-zinc-800 text-indigo-500 group-hover:text-indigo-400"><Globe size={16} /></div>
                                     <div><div className="text-sm font-bold text-zinc-200 group-hover:text-white">{item.name}</div><div className="text-xs text-zinc-500">{item.internal ? 'Native Tool' : 'External Tool'}</div></div>
                                 </button>
