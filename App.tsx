@@ -8,7 +8,7 @@ import { ExternalToolsView, TOOLS } from './components/ExternalToolsView';
 import { NetherCalculatorView } from './components/NetherCalculatorView';
 import { BrewingLabView } from './components/BrewingLabView';
 import { SettingsView } from './components/SettingsView';
-import PixelCircleGeneratorView from './components/PixelCircleGeneratorView';
+import { PixelCircleGeneratorView } from './components/PixelCircleGeneratorView';
 import { CATEGORIES, BEST_LOADOUTS, POTION_RECIPES } from './constants';
 
 type ViewMode = 'home' | 'checklist' | 'guide' | 'calculator' | 'notes' | 'tools' | 'nether' | 'brewing' | 'settings' | 'circle';
