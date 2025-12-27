@@ -1,4 +1,5 @@
 # Minecraft Utility
+
 <img width="1920" height="1080" alt="Screenshot 2025-12-21 223917" src="https://github.com/user-attachments/assets/809cfdcd-71ed-43ab-b5e0-50d573e53fac" />
 
 Minecraft Utility is a modern, web-based collection of tools designed to help Minecraft players plan, track, and optimize their gameplay.  
@@ -21,7 +22,7 @@ It focuses on quality-of-life features such as enchantment planning, XP optimiza
   - Minimize XP costs and avoid “Too Expensive” issues
 
 - **Nether Calculator**
-  - Convert Overworld coordinates to Nether coordinates and vise versa
+  - Convert Overworld coordinates to Nether coordinates and vice versa
 
 - **Notes**
   - Save coordinates, to-do lists, and ideas
@@ -32,10 +33,32 @@ It focuses on quality-of-life features such as enchantment planning, XP optimiza
   - Block palettes
   - Command generators and more
 
-This Project is an active work in progress.
-The current focus is on expanding tools, improving usability, and polishing the UI.
+---
 
-Feedback, suggestions, and feature ideas are welcome.
+## ⚒️ Current Development
 
-Created and maintained by **Exoticghost404**.
+This project is actively being developed. Current focus areas include:
+
+- Expanding existing tools
+- Improving usability and UX
+- Polishing the user interface for a modern experience
+
+Feedback, suggestions, and feature ideas are always welcome!  
+
+---
+
+## 👤 Author
+
+Created and maintained by **Exoticghost404**
+
+---
+
+## 📜 License
+
+Minecraft Utility is licensed under the **GNU General Public License v3.0 (GPL v3)**.  
+
+You are free to **use, modify, and distribute** this project, but **any redistributed or derivative work must also be licensed under GPL v3**.  
+
+For the full license text, see the [LICENSE](LICENSE) file included in this repository.
+
 
