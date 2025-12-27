@@ -8,7 +8,7 @@ import { ExternalToolsView, TOOLS } from './components/ExternalToolsView';
 import { NetherCalculatorView } from './components/NetherCalculatorView';
 import { BrewingLabView } from './components/BrewingLabView';
 import { SettingsView } from './components/SettingsView';
-import { CircleGeneratorView } from './components/PixelCircleGeneratorView';
+import { CircleGeneratorView } from './components/CircleGeneratorView';
 import { CATEGORIES, BEST_LOADOUTS, POTION_RECIPES } from './constants';
 
 type ViewMode = 'home' | 'checklist' | 'guide' | 'calculator' | 'notes' | 'tools' | 'nether' | 'brewing' | 'settings' | 'circle';
@@ -150,7 +150,7 @@ const App: React.FC = () => {
   if (view === 'guide') return <BestLoadoutsView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
   if (view === 'tools') return <ExternalToolsView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} onOpenBrewing={() => setView('brewing')} onOpenCircle={() => setView('circle')} />;
   if (view === 'brewing') return <BrewingLabView onBack={() => { setView('tools'); setSearchQuery(''); }} />;
-  if (view === 'circle') return <PixelCircleGeneratorView onBack={() => { setView('tools'); setSearchQuery(''); }} />;
+  if (view === 'circle') return <CircleGeneratorView onBack={() => { setView('tools'); setSearchQuery(''); }} />;
   if (view === 'settings') return <SettingsView onBack={() => { setView('home'); setSearchQuery(''); }} />;
   if (view === 'calculator') return <EnchantmentCalculatorView onBack={() => { setView('home'); setSearchQuery(''); }} />;
   if (view === 'notes') return <NotesView onBack={() => { setView('home'); setSearchQuery(''); }} />;
