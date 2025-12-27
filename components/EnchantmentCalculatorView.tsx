@@ -88,7 +88,8 @@ const normalizeItemType = (type: string): string => {
     if (t.includes('turtle')) return 'turtle_shell';
     if (t.includes('carrot')) return 'carrot_on_a_stick';
     if (t.includes('flint')) return 'flint_and_steel';
-    return t;
+    if (t.includes('fishing')) return 'fishing_rod';
+    return t.replace(/\s+/g, '_').replace(/[\/]/g, '_');
 };
 
 const getMaxLevelNumber = (maxLevelRange?: string) => {
@@ -398,7 +399,7 @@ function processCalculation(itemType: string, enchants: [string, number][], mode
             });
         }
     } else {
-        const formattedItemName = itemType.charAt(0).toUpperCase() + itemType.slice(1);
+        const formattedItemName = itemType.charAt(0).toUpperCase() + itemType.slice(1).replace(/_/g, ' ');
         base_item = new item_obj('item', 0, [], formattedItemName);
         base_item.c = { I: 'item', l: 0, w: 0 };
     }
@@ -591,14 +592,14 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
                           placeholder="Search items..." 
                           value={itemSearchQuery} 
                           onChange={(e) => setItemSearchQuery(e.target.value)} 
-                          className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-zinc-200 outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all" 
+                          className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-zinc-200 outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all placeholder-zinc-700" 
                         />
                     </div>
                 </div>
                 <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                     <div className="flex flex-wrap gap-2 content-start">
                         {filteredItemTypes.map(type => (
-                            <button key={type} onClick={() => { setSelectedItemType(type); setSelectedEnchants(new Map()); setEnchantSearchQuery(''); setSolution(null); }} className={`px-2 py-1.5 rounded text-xs font-medium transition-all border ${selectedItemType === type ? 'bg-amber-600 text-white border-amber-600 shadow shadow-amber-900/50' : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:bg-zinc-800'}`}>{type}</button>
+                            <button key={type} onClick={() => { setSelectedItemType(type); setSelectedEnchants(new Map()); setEnchantSearchQuery(''); setSolution(null); }} className={`px-2 py-1.5 rounded text-[11px] font-bold transition-all border ${selectedItemType === type ? 'bg-amber-600 text-white border-amber-600 shadow shadow-amber-900/50' : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:bg-zinc-800'}`}>{type}</button>
                         ))}
                     </div>
                 </div>
@@ -620,7 +621,7 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
                     </button>
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" size={14} />
-                        <input type="text" placeholder="Filter enchants..." value={enchantSearchQuery} onChange={(e) => setEnchantSearchQuery(e.target.value)} className="w-full bg-zinc-950 border border-zinc-700 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-200 outline-none focus:border-amber-500 transition-colors" />
+                        <input type="text" placeholder="Filter enchants..." value={enchantSearchQuery} onChange={(e) => setEnchantSearchQuery(e.target.value)} className="w-full bg-zinc-950 border border-zinc-700 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-200 outline-none focus:border-amber-500 transition-colors placeholder-zinc-700" />
                     </div>
                  </div>
                  <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-1">
