@@ -1,7 +1,7 @@
 
 // This component provides a pixel-accurate circle and ellipse generator for Minecraft builds.
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { ArrowLeft, Circle, Maximize, Hash, Info, RotateCcw, Grid, Box, ZoomIn, ZoomOut, Target, Move, Layout } from 'lucide-react';
+import { ArrowLeft, Circle, Maximize, Hash, RotateCcw, Box, ZoomIn, ZoomOut, Target, Move, Layout } from 'lucide-react';
 
 interface CircleGeneratorViewProps {
   onBack: () => void;
@@ -14,7 +14,7 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
   const [height, setHeight] = useState(64);
   const [style, setStyle] = useState<RenderStyle>('outline');
   const [isLocked, setIsLocked] = useState(true);
-  const [showGrid, setShowGrid] = useState(true);
+  const [showGrid] = useState(true);
   const [zoom, setZoom] = useState(1);
   const [hoverCoord, setHoverCoord] = useState<{ x: number, y: number } | null>(null);
 
