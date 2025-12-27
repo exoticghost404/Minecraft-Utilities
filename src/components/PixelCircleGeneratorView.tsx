@@ -1,18 +1,19 @@
-import React, { useState, useMemo } from 'react';
-import { ArrowLeft, Circle, Maximize, Copy, Check, Hash, Info, RotateCcw, Lock, Unlock } from 'lucide-react';
 
-interface CircleGeneratorViewProps {
+import React, { useState, useMemo } from 'react';
+import { ArrowLeft, Circle, Maximize, Hash, Info, RotateCcw, Lock, Unlock } from 'lucide-react';
+
+interface PixelCircleGeneratorViewProps {
   onBack: () => void;
 }
 
 type Mode = 'thin' | 'thick' | 'filled';
 
-export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack }) => {
+// Renamed from CircleGeneratorView to PixelCircleGeneratorView to match the import in App.tsx
+export const PixelCircleGeneratorView: React.FC<PixelCircleGeneratorViewProps> = ({ onBack }) => {
   const [width, setWidth] = useState(21);
   const [height, setHeight] = useState(21);
   const [mode, setMode] = useState<Mode>('thin');
   const [lockRatio, setLockRatio] = useState(true);
-  const [copied, setCopied] = useState(false);
 
   const grid = useMemo(() => {
     const newGrid: boolean[][] = Array(height).fill(0).map(() => Array(width).fill(false));
@@ -30,8 +31,6 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
         if (mode === 'filled') {
           if (dist <= 1.0) newGrid[y][x] = true;
         } else if (mode === 'thick') {
-          // Thick outline
-          const innerDist = ((Math.abs(dx) - 0.5) ** 2) / (rx * rx) + ((Math.abs(dy) - 0.5) ** 2) / (ry * ry);
           const outerDist = ((Math.abs(dx) + 0.5) ** 2) / (rx * rx) + ((Math.abs(dy) + 0.5) ** 2) / (ry * ry);
           if (dist <= 1.1 && (outerDist >= 0.85 || dist >= 0.85)) {
              // Basic distance check for outline
