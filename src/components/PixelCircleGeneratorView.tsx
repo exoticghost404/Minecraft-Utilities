@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { ArrowLeft, Circle, Grid, Maximize, Boxes, Info, Layers, Box, ZoomIn, ZoomOut, Move, Target, Maximize2, LayoutGrid, Type, Crosshair } from 'lucide-react';
+import { ArrowLeft, Circle, Grid, Maximize, Boxes, Info, Layers, Box, ZoomIn, ZoomOut, Target, Maximize2, LayoutGrid, Type, Crosshair } from 'lucide-react';
 
 interface PixelCircleGeneratorViewProps {
   onBack: () => void;
