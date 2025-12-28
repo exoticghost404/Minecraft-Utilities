@@ -322,7 +322,7 @@ const App: React.FC = () => {
         <div className="flex flex-col items-center gap-3">
             <p className="text-zinc-700 text-xs flex items-center justify-center gap-1">Made by <span className="text-emerald-500/60 font-medium">Exoticghost404</span></p>
             <div className="flex items-center gap-4 text-zinc-600">
-                <a href="https://www.youtube.com/@ExoticGhost404" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 hover:scale-110 transition-all" title="YouTube"><Youtube size={18} /></a>
+                <a href="https://www.youtube.com/channel/UCs9-IGmuj-ogpe5_jlg7xjw?sub_confirmation=1" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 hover:scale-110 transition-all" title="YouTube"><Youtube size={18} /></a>
                 <a href="https://www.twitch.tv/exoticghost404" target="_blank" rel="noopener noreferrer" className="hover:text-purple-500 hover:scale-110 transition-all" title="Twitch"><Twitch size={18} /></a>
                 <a href="https://www.instagram.com/exoticghost404" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 hover:scale-110 transition-all" title="Instagram"><Instagram size={18} /></a>
             </div>
