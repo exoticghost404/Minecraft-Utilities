@@ -1,8 +1,6 @@
-
-
 // This component provides a pixel-accurate circle and ellipse generator for Minecraft builds.
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { ArrowLeft, Circle, Maximize, Hash, RotateCcw, Box, ZoomIn, ZoomOut, Target, Move, Layout } from 'lucide-react';
+import { ArrowLeft, Circle, Maximize, Hash, RotateCcw, Box, ZoomIn, ZoomOut, Target, Move, Layout, MousePointer2, Search } from 'lucide-react';
 
 interface CircleGeneratorViewProps {
   onBack: () => void;
@@ -11,8 +9,8 @@ interface CircleGeneratorViewProps {
 type RenderStyle = 'outline' | 'filled';
 
 export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack }) => {
-  const [width, setWidth] = useState(64);
-  const [height, setHeight] = useState(64);
+  const [width, setWidth] = useState(32);
+  const [height, setHeight] = useState(32);
   const [style, setStyle] = useState<RenderStyle>('outline');
   const [isLocked, setIsLocked] = useState(true);
   const [showGrid] = useState(true);
@@ -43,7 +41,6 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
             row.push(false);
             continue;
           }
-          // Simple edge detection: if any neighbor is outside the ellipse, this is an edge
           const nxL = ((x - 0.5) - rx)**2 / (rx*rx) + (dy*dy)/(ry*ry);
           const nxR = ((x + 1.5) - rx)**2 / (rx*rx) + (dy*dy)/(ry*ry);
           const nyT = (dx*dx)/(rx*rx) + ((y - 0.5) - ry)**2 / (ry*ry);
@@ -61,7 +58,6 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
     return gridData.reduce((acc, row) => acc + row.filter(cell => cell).length, 0);
   }, [gridData]);
 
-  // High-performance canvas drawing for the pixel grid
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -75,7 +71,7 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
     canvas.height = height * cellSize;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = '#6366f1'; // Indigo-500
+    ctx.fillStyle = '#6366f1'; 
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         if (gridData[y][x]) {
@@ -109,7 +105,7 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
     }
   }, [gridData, showGrid, zoom, hoverCoord, width, height]);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
@@ -123,7 +119,7 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
   const handleFitDesign = () => {
     if (!containerRef.current) return;
     const { clientWidth, clientHeight } = containerRef.current;
-    const padding = 120;
+    const padding = window.innerWidth < 768 ? 40 : 120;
     const scaleW = (clientWidth - padding) / (width * 12);
     const scaleH = (clientHeight - padding) / (height * 12);
     setZoom(Math.min(scaleW, scaleH, 2.5));
@@ -142,40 +138,41 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 pb-20">
-      <header className="sticky top-0 z-40 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800 shadow-lg mb-8">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+    <div className="h-screen flex flex-col bg-zinc-950 overflow-hidden">
+      <header className="flex-none bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800 shadow-lg z-40">
+        <div className="max-w-7xl mx-auto px-4 py-3 md:py-4">
           <button 
             onClick={onBack}
-            className="mb-4 flex items-center gap-2 text-zinc-400 hover:text-indigo-400 transition-colors text-sm font-medium"
+            className="mb-2 md:mb-3 flex items-center gap-2 text-zinc-400 hover:text-indigo-400 transition-colors text-xs md:text-sm font-medium active:scale-95"
           >
             <ArrowLeft size={16} /> Back to Tools
           </button>
           
           <div className="flex items-center gap-3">
-             <div className="bg-indigo-500/10 p-2 rounded-lg border border-indigo-500/20">
-               <Circle className="text-indigo-400" size={24} />
+             <div className="bg-indigo-500/10 p-2 rounded-xl border border-indigo-500/20">
+               <Circle className="text-indigo-400 w-5 h-5 md:w-6 md:h-6" size={24} />
              </div>
              <div>
-               <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent tracking-tight">
-                 Pixel Circle Generator
+               <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent tracking-tight">
+                 Circle Generator
                </h1>
-               <p className="text-xs text-zinc-400">Advanced Architectural Blueprint</p>
+               <p className="text-[10px] md:text-xs text-zinc-500">Advanced Architectural Blueprint</p>
              </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <div className="lg:col-span-4 space-y-6">
-          <section className="bg-[#111114]/50 border border-zinc-900 rounded-2xl p-6 space-y-6 shadow-xl relative overflow-hidden">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.25em] flex items-center gap-2.5">
+      <main className="flex-1 min-h-0 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-y-auto lg:overflow-hidden">
+        {/* Controls Sidebar */}
+        <div className="lg:col-span-4 flex flex-col gap-6 lg:overflow-y-auto no-scrollbar pb-6 lg:pb-0">
+          <section className="flex-none bg-[#111114]/50 border border-zinc-900 rounded-2xl p-4 md:p-6 space-y-6 shadow-xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[10px] md:text-[11px] font-black text-zinc-500 uppercase tracking-[0.25em] flex items-center gap-2.5">
                 <Maximize size={14} /> Dimensions
               </h3>
               <button 
                 onClick={() => setIsLocked(!isLocked)}
-                className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border ${
+                className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border active:scale-95 ${
                   isLocked ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' : 'bg-zinc-800 border-zinc-700 text-zinc-500'
                 }`}
               >
@@ -184,67 +181,64 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
             </div>
 
             <div className="space-y-6">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest">
+              <div className="space-y-2.5">
+                <div className="flex justify-between items-center text-[10px] md:text-xs font-black uppercase tracking-widest">
                   <span className="text-zinc-500">Width</span>
-                  <span className="text-indigo-400 font-mono text-sm tabular-nums min-w-[3ch] text-right">{width}</span>
+                  <span className="text-indigo-400 font-mono text-sm tabular-nums">{width}</span>
                 </div>
-                <input type="range" min="1" max="128" value={width} onChange={(e) => updateWidth(parseInt(e.target.value))} className="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
+                <input type="range" min="1" max="128" value={width} onChange={(e) => updateWidth(parseInt(e.target.value))} className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
               </div>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center text-xs font-black uppercase tracking-widest">
+              <div className="space-y-2.5">
+                <div className="flex justify-between items-center text-[10px] md:text-xs font-black uppercase tracking-widest">
                   <span className="text-zinc-500">Height</span>
-                  <span className="text-indigo-400 font-mono text-sm tabular-nums min-w-[3ch] text-right">{height}</span>
+                  <span className="text-indigo-400 font-mono text-sm tabular-nums">{height}</span>
                 </div>
-                <input type="range" min="1" max="128" value={height} onChange={(e) => updateHeight(parseInt(e.target.value))} className="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
+                <input type="range" min="1" max="128" value={height} onChange={(e) => updateHeight(parseInt(e.target.value))} className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
               </div>
             </div>
 
-            <div className="pt-6 border-t border-zinc-900 space-y-4">
-              <h3 className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.25em] flex items-center gap-2.5">
-                 <Layout size={14} /> Style
+            <div className="pt-5 border-t border-zinc-900 space-y-4">
+              <h3 className="text-[10px] md:text-[11px] font-black text-zinc-500 uppercase tracking-[0.25em] flex items-center gap-2.5">
+                 <Layout size={14} /> Render Style
               </h3>
               <div className="grid grid-cols-2 gap-3">
                 <button 
                   onClick={() => setStyle('outline')}
-                  className={`flex flex-col items-center gap-2.5 p-6 rounded-2xl border transition-all ${
+                  className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all active:scale-95 ${
                     style === 'outline' ? 'bg-indigo-600/15 border-indigo-500/50 text-indigo-400 shadow-xl' : 'bg-zinc-950 border-zinc-900 text-zinc-600'
                   }`}
                 >
-                  <Circle size={22} className={style === 'outline' ? 'fill-none stroke-[3]' : 'fill-none stroke-2'} />
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Outline</span>
+                  <Circle size={20} className={style === 'outline' ? 'fill-none stroke-[3]' : 'fill-none stroke-2'} />
+                  <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">Outline</span>
                 </button>
                 <button 
                   onClick={() => setStyle('filled')}
-                  className={`flex flex-col items-center gap-2.5 p-6 rounded-2xl border transition-all ${
+                  className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all active:scale-95 ${
                     style === 'filled' ? 'bg-indigo-600/15 border-indigo-500/50 text-indigo-400 shadow-xl' : 'bg-zinc-950 border-zinc-900 text-zinc-600'
                   }`}
                 >
-                  <Circle size={22} className={style === 'filled' ? 'fill-current' : 'fill-zinc-800'} />
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em]">Filled</span>
+                  <Circle size={20} className={style === 'filled' ? 'fill-current' : 'fill-zinc-800'} />
+                  <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">Filled</span>
                 </button>
               </div>
             </div>
           </section>
 
-          <section className="bg-[#111114]/50 border border-zinc-900 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none group-hover:scale-110 transition-transform duration-500">
-              <Box size={140} />
-            </div>
-            <h3 className="text-[11px] font-black text-zinc-500 uppercase tracking-[0.25em] flex items-center gap-2.5 mb-6">
+          <section className="flex-none bg-[#111114]/50 border border-zinc-900 rounded-2xl p-4 md:p-6 shadow-xl relative overflow-hidden group">
+            <h3 className="text-[10px] md:text-[11px] font-black text-zinc-500 uppercase tracking-[0.25em] flex items-center gap-2.5 mb-5">
               <Hash size={14} /> Material Cost
             </h3>
-            <div className="flex items-baseline gap-2 mb-6">
-              <span className="text-4xl font-black text-white tabular-nums">{blockCount}</span>
-              <span className="text-xs font-black text-zinc-500 uppercase tracking-[0.2em]">Blocks</span>
+            <div className="flex items-baseline gap-2 mb-5">
+              <span className="text-3xl md:text-4xl font-black text-white tabular-nums">{blockCount}</span>
+              <span className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em]">Blocks</span>
             </div>
-            <div className="bg-black/40 rounded-2xl p-4 border border-zinc-900 flex items-center gap-4">
-              <div className="p-3 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
-                <Box className="text-indigo-400" size={20} />
+            <div className="bg-black/40 rounded-xl md:rounded-2xl p-4 border border-zinc-900 flex items-center gap-4">
+              <div className="p-2 md:p-3 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
+                <Box className="text-indigo-400" size={18} />
               </div>
-              <div>
-                <div className="text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-0.5">Total Requirement</div>
-                <div className="text-sm font-black text-zinc-300 tabular-nums">
+              <div className="min-w-0">
+                <div className="text-[8px] md:text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] mb-0.5">Inventory</div>
+                <div className="text-xs md:text-sm font-black text-zinc-300 tabular-nums truncate">
                   {Math.floor(blockCount / 64)} Stacks + {blockCount % 64} Blocks
                 </div>
               </div>
@@ -252,39 +246,23 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
           </section>
         </div>
 
-        <div className="lg:col-span-8 flex flex-col gap-4">
-           <div className="bg-[#09090b] border border-zinc-900 rounded-[2rem] overflow-hidden shadow-2xl flex flex-col min-h-[680px] relative">
-              <div className="bg-[#111114]/90 backdrop-blur-xl p-5 border-b border-zinc-900 flex items-center justify-between shrink-0 z-20">
-                  <div className="flex items-center gap-5">
-                    <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] flex items-center gap-3">
-                      <Move size={14} /> Area
-                    </span>
-                    <div className="h-4 w-[1px] bg-zinc-800 mx-1" />
-                    <div className="min-w-[50px] text-center">
-                      <span className="text-[10px] font-mono font-bold text-zinc-700 tabular-nums">
+        {/* Preview Area */}
+        <div className="lg:col-span-8 flex flex-col h-full min-h-[450px] lg:min-h-0">
+           <div className="bg-[#09090b] border border-zinc-900 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-2xl flex flex-col h-full relative">
+              <div className="flex-none bg-[#111114]/90 backdrop-blur-xl p-3 md:p-4 border-b border-zinc-900 flex flex-wrap items-center justify-between gap-3 shrink-0 z-20">
+                  <div className="flex items-center gap-3 md:gap-5 overflow-x-auto no-scrollbar flex-1 min-w-0">
+                    <div className="flex items-center gap-2 whitespace-nowrap">
+                      <Move size={12} className="text-zinc-600 md:w-[14px]" />
+                      <span className="text-[9px] md:text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Area</span>
+                      <span className="text-[10px] font-mono font-bold text-zinc-700 tabular-nums ml-1">
                         {width}x{height}
                       </span>
                     </div>
-                    <div className="h-4 w-[1px] bg-zinc-800 mx-1" />
-                    <div className="min-w-[120px]">
-                      {hoverCoord && (
-                        <span className="text-[10px] font-mono font-bold text-indigo-400 bg-indigo-500/10 px-3 py-1.5 rounded-lg border border-indigo-500/20 block text-center tabular-nums animate-in fade-in zoom-in-95 duration-200">
-                          X: {hoverCoord.x} Y: {hoverCoord.y}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <button 
-                      onClick={handleFitDesign} 
-                      className="flex items-center gap-2.5 px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
-                    >
-                      <Target size={14} /> Fit Design
-                    </button>
+                    <div className="h-4 w-[1px] bg-zinc-800 shrink-0" />
                     
-                    <div className="flex items-center gap-4 bg-black/60 border border-zinc-900 px-4 py-1.5 rounded-2xl">
-                      <button onClick={() => setZoom(prev => Math.max(0.2, prev - 0.2))} className="text-zinc-600 hover:text-zinc-400 transition-colors"><ZoomOut size={16} /></button>
+                    {/* Magnifier Scroll Bar (Zoom Slider) */}
+                    <div className="flex items-center gap-2 md:gap-3 bg-black/40 px-3 py-1.5 rounded-xl border border-zinc-800/50 group/zoom">
+                      <ZoomOut size={12} className="text-zinc-600 group-hover/zoom:text-zinc-400 transition-colors" />
                       <input 
                         type="range" 
                         min="0.2" 
@@ -292,23 +270,49 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
                         step="0.1" 
                         value={zoom} 
                         onChange={(e) => setZoom(parseFloat(e.target.value))} 
-                        className="w-24 h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-indigo-500" 
+                        className="w-20 md:w-32 h-1 bg-zinc-800 rounded-full appearance-none cursor-pointer accent-indigo-500"
                       />
-                      <button onClick={() => setZoom(prev => Math.min(4, prev + 0.2))} className="text-zinc-600 hover:text-zinc-400 transition-colors"><ZoomIn size={16} /></button>
+                      <ZoomIn size={12} className="text-zinc-600 group-hover/zoom:text-zinc-400 transition-colors" />
+                      <div className="h-3 w-[1px] bg-zinc-800 mx-1" />
+                      <span className="text-[9px] font-mono font-bold text-indigo-400 tabular-nums min-w-[30px]">{Math.round(zoom * 100)}%</span>
                     </div>
 
+                    <div className="h-4 w-[1px] bg-zinc-800 shrink-0 hidden sm:block" />
+                    <div className="min-w-[80px] md:min-w-[120px] hidden sm:block">
+                      {hoverCoord ? (
+                        <span className="text-[9px] md:text-[10px] font-mono font-bold text-indigo-400 bg-indigo-500/10 px-2 md:px-3 py-1 md:py-1.5 rounded-lg border border-indigo-500/20 block text-center tabular-nums animate-in fade-in zoom-in-95 duration-200">
+                          X:{hoverCoord.x} Y:{hoverCoord.y}
+                        </span>
+                      ) : (
+                        <span className="text-[9px] md:text-[10px] font-mono text-zinc-700 flex items-center justify-center gap-1.5 opacity-50">
+                          <MousePointer2 size={10} /> Hover Grid
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 md:gap-3 ml-auto shrink-0">
                     <button 
-                      onClick={() => { setWidth(64); setHeight(64); setZoom(1); setStyle('outline'); }} 
-                      className="p-2.5 bg-black/60 border border-zinc-900 rounded-xl text-zinc-500 hover:text-white transition-all"
+                      onClick={handleFitDesign} 
+                      className="p-2 md:px-5 md:py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center gap-2"
+                      title="Fit Design"
                     >
-                      <RotateCcw size={16} />
+                      <Target size={14} /> <span className="hidden sm:inline">Fit Design</span>
+                    </button>
+                    
+                    <button 
+                      onClick={() => { setWidth(32); setHeight(32); setZoom(1); setStyle('outline'); }} 
+                      className="p-2 bg-black/60 border border-zinc-900 rounded-xl text-zinc-500 hover:text-white transition-all active:scale-90"
+                      title="Reset Camera"
+                    >
+                      <RotateCcw size={14} />
                     </button>
                   </div>
               </div>
 
               <div 
                 ref={containerRef}
-                className="flex-1 bg-[#050507] overflow-auto flex items-center justify-center relative custom-scrollbar group p-8"
+                className="flex-1 bg-[#050507] overflow-auto flex items-center justify-center relative no-scrollbar group p-4 md:p-8 touch-none"
                 style={{ 
                   backgroundImage: showGrid ? 'radial-gradient(circle, #18181b 1.5px, transparent 1.5px)' : 'none',
                   backgroundSize: '40px 40px'
@@ -316,11 +320,21 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
               >
                 <canvas 
                   ref={canvasRef} 
-                  onMouseMove={handleMouseMove} 
-                  onMouseLeave={() => setHoverCoord(null)}
-                  className="shadow-[0_0_120px_rgba(0,0,0,0.9)] border border-zinc-900 cursor-crosshair transition-opacity duration-300 rounded"
+                  onPointerMove={handlePointerMove} 
+                  onPointerLeave={() => setHoverCoord(null)}
+                  className="shadow-[0_0_120px_rgba(0,0,0,0.9)] border border-zinc-900 cursor-crosshair transition-opacity duration-300 rounded touch-none"
                 />
               </div>
+           </div>
+           
+           {/* Mobile Coordinate Display */}
+           <div className="flex sm:hidden items-center justify-between px-4 py-2 bg-zinc-900/50 border border-zinc-800 rounded-xl mt-3">
+              <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2"><MousePointer2 size={12}/> Focus</span>
+              {hoverCoord ? (
+                <span className="text-xs font-mono font-bold text-indigo-400 tabular-nums">X:{hoverCoord.x} Y:{hoverCoord.y}</span>
+              ) : (
+                <span className="text-xs font-mono text-zinc-700">-- : --</span>
+              )}
            </div>
         </div>
       </main>
