@@ -234,7 +234,7 @@ const App: React.FC = () => {
           Minecraft Utility
         </h1>
         <p className="text-zinc-500 max-w-md mx-auto text-lg mb-10 font-medium">
-          Efficiency refined. Your ultimate companion for every survival world.
+        Your ultimate companion for every survival world.
         </p>
 
         {/* SEARCH BAR */}
@@ -346,13 +346,13 @@ const App: React.FC = () => {
       <footer className="mt-auto mb-12 text-center space-y-6 relative z-10">
         <div className="h-px w-24 bg-gradient-to-r from-transparent via-zinc-800 to-transparent mx-auto mb-10" />
         <div className="flex flex-col items-center gap-4">
-            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em]">Designed by <span className="text-emerald-500/80">Exoticghost404</span></p>
+            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em]">Made by <span className="text-emerald-500/80">Exoticghost404</span></p>
             <div className="flex items-center gap-6 text-zinc-600 bg-zinc-900/50 backdrop-blur-xl px-6 py-3 rounded-full border border-zinc-800">
                 <a href="https://www.youtube.com/channel/UCs9-IGmuj-ogpe5_jlg7xjw?sub_confirmation=1" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 hover:scale-125 transition-all" title="YouTube"><Youtube size={20} /></a>
                 <a href="https://www.twitch.tv/exoticghost404" target="_blank" rel="noopener noreferrer" className="hover:text-purple-500 hover:scale-125 transition-all" title="Twitch"><Twitch size={20} /></a>
                 <a href="https://www.instagram.com/exoticghost404" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 hover:scale-125 transition-all" title="Instagram"><Instagram size={20} /></a>
             </div>
-            <p className="text-zinc-700 text-[10px] font-bold">© {new Date().getFullYear()} Minecraft Utility Hub</p>
+            <p className="text-zinc-700 text-[10px] font-bold">© {new Date().getFullYear()} Minecraft Utility</p>
         </div>
       </footer>
     </div>
