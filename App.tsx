@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Download, Youtube, Twitch, Instagram, FlaskConical, Settings } from 'lucide-react';
+import { BookOpen, CheckSquare, Pickaxe, Calculator, Notebook, Globe, Flame, Search, Download, Youtube, Twitch, Instagram, FlaskConical, Settings } from 'lucide-react';
 import { ChecklistView } from './components/ChecklistView';
 import { BestLoadoutsView } from './components/BestLoadoutsView';
 import { EnchantmentCalculatorView } from './components/EnchantmentCalculatorView';
@@ -210,8 +210,9 @@ const App: React.FC = () => {
       </div>
 
       <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl mt-8">
+        {/* MAIN APP LOGO: Replace the icon below with an <img> tag if you have a custom logo file */}
         <div className="inline-block p-4 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-          <Sparkles size={48} className="text-emerald-400" />
+          <Pickaxe size={48} className="text-emerald-400" />
         </div>
         <h1 className="text-4xl md:text-6xl font-black bg-gradient-to-br from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-4 tracking-tight">
           Minecraft Utility
