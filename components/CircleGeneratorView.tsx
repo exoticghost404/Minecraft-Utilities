@@ -231,7 +231,8 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
                         type="number" 
                         value={Math.round(zoom * 100)} 
                         onChange={(e) => handleManualZoom(parseInt(e.target.value))}
-                        className="bg-transparent text-indigo-400 font-mono text-xs w-8 text-right focus:outline-none border-b border-transparent focus:border-indigo-500 transition-colors"
+                        /* CHANGED: Increased width from w-8 to w-12 to fit 3 digits comfortably */
+                        className="bg-transparent text-indigo-400 font-mono text-xs w-12 text-right focus:outline-none border-b border-transparent focus:border-indigo-500 transition-colors"
                       />
                       <span className="text-[10px] text-zinc-600 font-bold pr-2">%</span>
                     </div>
