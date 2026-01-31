@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Download, Youtube, Twitch, Instagram, FlaskConical, Settings } from 'lucide-react';
+
+import React, { useEffect, useRef, useState } from 'react';
+import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Download, Youtube, Twitch, Instagram, Settings, FlaskConical, WifiOff } from 'lucide-react';
 import { ChecklistView } from './components/ChecklistView';
 import { BestLoadoutsView } from './components/BestLoadoutsView';
 import { EnchantmentCalculatorView } from './components/EnchantmentCalculatorView';
@@ -10,8 +11,7 @@ import { BrewingLabView } from './components/BrewingLabView';
 import { SettingsView } from './components/SettingsView';
 import { CircleGeneratorView } from './components/CircleGeneratorView';
 import { CATEGORIES, BEST_LOADOUTS, POTION_RECIPES } from './constants';
-
-type ViewMode = 'home' | 'checklist' | 'guide' | 'calculator' | 'notes' | 'tools' | 'nether' | 'brewing' | 'settings' | 'circle';
+import { useNavigation, ViewMode } from './hooks/useNavigation';
 
 const MENU_ITEMS = [
   {
@@ -19,7 +19,7 @@ const MENU_ITEMS = [
     title: 'Checklist',
     description: 'Track collected enchantments and monitor progress.',
     icon: CheckSquare,
-    view: 'checklist',
+    view: 'checklist' as ViewMode,
     theme: {
       hoverBorder: 'hover:border-emerald-500/50',
       hoverShadow: 'hover:shadow-[0_0_30px_rgba(16,185,129,0.1)]',
@@ -35,7 +35,7 @@ const MENU_ITEMS = [
     title: 'Best Enchantments',
     description: 'Optimal combinations for every gear slot.',
     icon: BookOpen,
-    view: 'guide',
+    view: 'guide' as ViewMode,
     theme: {
       hoverBorder: 'hover:border-purple-500/50',
       hoverShadow: 'hover:shadow-[0_0_30px_rgba(168,85,247,0.1)]',
@@ -51,7 +51,7 @@ const MENU_ITEMS = [
     title: 'Anvil Calculator',
     description: 'Plan order to minimize XP costs.',
     icon: Calculator,
-    view: 'calculator',
+    view: 'calculator' as ViewMode,
     theme: {
       hoverBorder: 'hover:border-amber-500/50',
       hoverShadow: 'hover:shadow-[0_0_30px_rgba(245,158,11,0.1)]',
@@ -67,7 +67,7 @@ const MENU_ITEMS = [
     title: 'Nether Calculator',
     description: 'Convert Overworld coordinates to Nether.',
     icon: Flame,
-    view: 'nether',
+    view: 'nether' as ViewMode,
     theme: {
       hoverBorder: 'hover:border-red-500/50',
       hoverShadow: 'hover:shadow-[0_0_30_px_rgba(239,68,68,0.1)]',
@@ -83,7 +83,7 @@ const MENU_ITEMS = [
     title: 'Notes',
     description: 'Save coords, to-dos, and ideas.',
     icon: Notebook,
-    view: 'notes',
+    view: 'notes' as ViewMode,
     theme: {
       hoverBorder: 'hover:border-blue-500/50',
       hoverShadow: 'hover:shadow-[0_0_30px_rgba(59,130,246,0.1)]',
@@ -99,7 +99,7 @@ const MENU_ITEMS = [
     title: 'More Tools',
     description: 'Brewing lab, seed maps, armor trims, banners, and other utilities.',
     icon: Globe,
-    view: 'tools',
+    view: 'tools' as ViewMode,
     theme: {
       hoverBorder: 'hover:border-indigo-500/50',
       hoverShadow: 'hover:shadow-[0_0_30px_rgba(99,102,241,0.1)]',
@@ -113,19 +113,38 @@ const MENU_ITEMS = [
 ];
 
 const App: React.FC = () => {
-  const [view, setView] = useState<ViewMode>('home');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const { currentView, push, pop, params } = useNavigation('home');
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
     };
+
+    const handleOnlineStatus = () => setIsOnline(navigator.onLine);
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('online', handleOnlineStatus);
+    window.addEventListener('offline', handleOnlineStatus);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('online', handleOnlineStatus);
+      window.removeEventListener('offline', handleOnlineStatus);
+    };
   }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -139,23 +158,17 @@ const App: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') setDeferredPrompt(null);
-  };
+  if (currentView === 'checklist') return <ChecklistView onBack={pop} initialSearch={params.search || ''} />;
+  if (currentView === 'guide') return <BestLoadoutsView onBack={pop} initialSearch={params.search || ''} />;
+  if (currentView === 'tools') return <ExternalToolsView onBack={pop} initialSearch={params.search || ''} onOpenBrewing={() => push('brewing')} onOpenCircle={() => push('circle')} />;
+  if (currentView === 'brewing') return <BrewingLabView onBack={pop} />;
+  if (currentView === 'circle') return <CircleGeneratorView onBack={pop} />;
+  if (currentView === 'settings') return <SettingsView onBack={pop} />;
+  if (currentView === 'calculator') return <EnchantmentCalculatorView onBack={pop} />;
+  if (currentView === 'notes') return <NotesView onBack={pop} />;
+  if (currentView === 'nether') return <NetherCalculatorView onBack={pop} />;
 
-  if (view === 'checklist') return <ChecklistView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
-  if (view === 'guide') return <BestLoadoutsView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
-  if (view === 'tools') return <ExternalToolsView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} onOpenBrewing={() => setView('brewing')} onOpenCircle={() => setView('circle')} />;
-  if (view === 'brewing') return <BrewingLabView onBack={() => { setView('tools'); setSearchQuery(''); }} />;
-  if (view === 'circle') return <CircleGeneratorView onBack={() => { setView('tools'); setSearchQuery(''); }} />;
-  if (view === 'settings') return <SettingsView onBack={() => { setView('home'); setSearchQuery(''); }} />;
-  if (view === 'calculator') return <EnchantmentCalculatorView onBack={() => { setView('home'); setSearchQuery(''); }} />;
-  if (view === 'notes') return <NotesView onBack={() => { setView('home'); setSearchQuery(''); }} />;
-  if (view === 'nether') return <NetherCalculatorView onBack={() => { setView('home'); setSearchQuery(''); }} />;
-
+  const searchQuery = params.search || '';
   const menuResults = MENU_ITEMS.filter(item => 
     item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -192,16 +205,21 @@ const App: React.FC = () => {
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-zinc-950 to-black text-zinc-100 relative">
       
       <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
+        {!isOnline && (
+          <div className="flex items-center gap-2 px-3 py-2 bg-amber-500/20 border border-amber-500/30 text-amber-400 rounded-lg text-xs font-bold animate-pulse">
+            <WifiOff size={14} /> Offline Mode
+          </div>
+        )}
         {deferredPrompt && (
           <button
             onClick={handleInstallClick}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 font-bold border border-emerald-400/30"
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold shadow-lg transition-all active:scale-95 border border-emerald-400/30"
           >
             <Download size={18} /> <span className="hidden sm:inline">Install App</span>
           </button>
         )}
         <button
-          onClick={() => setView('settings')}
+          onClick={() => push('settings')}
           className="p-2.5 rounded-lg bg-zinc-800/80 border border-zinc-700 hover:bg-zinc-700 hover:text-white text-zinc-400 transition-all shadow-lg"
           title="Settings & Backup"
         >
@@ -232,7 +250,7 @@ const App: React.FC = () => {
                     placeholder="Search enchants, potions, tools..."
                     className="w-full bg-transparent text-zinc-100 py-4 px-4 text-lg outline-none placeholder-zinc-500"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => push('home', { search: e.target.value })}
                 />
             </div>
         </div>
@@ -246,7 +264,7 @@ const App: React.FC = () => {
                         {menuResults.map((item) => (
                             <button
                             key={item.id}
-                            onClick={() => setView(item.view as ViewMode)}
+                            onClick={() => push(item.view)}
                             className={`group relative p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800 ${item.theme.hoverBorder} hover:bg-zinc-900 transition-all duration-300 text-left flex flex-col h-full ${item.theme.hoverShadow} overflow-hidden`}
                             >
                             <div className={`absolute inset-0 bg-gradient-to-br ${item.theme.gradient} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity`} />
@@ -275,19 +293,19 @@ const App: React.FC = () => {
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {enchantResults.map((item) => (
-                                <button key={`ench-${item.id}`} onClick={() => setView('checklist')} className="flex items-center gap-3 p-3 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-emerald-500/50 hover:bg-zinc-900 transition-all text-left group">
+                                <button key={`ench-${item.id}`} onClick={() => push('checklist')} className="flex items-center gap-3 p-3 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-emerald-500/50 hover:bg-zinc-900 transition-all text-left group">
                                     <div className="p-2 rounded bg-zinc-900 border border-zinc-800 text-emerald-500 group-hover:text-emerald-400"><CheckSquare size={16} /></div>
                                     <div><div className="text-sm font-bold text-zinc-200 group-hover:text-white">{item.name}</div><div className="text-xs text-zinc-500">Checklist • {item.categoryName}</div></div>
                                 </button>
                             ))}
                             {potionResults.map((item) => (
-                                <button key={`potion-${item.id}`} onClick={() => { setView('brewing'); setSearchQuery(''); }} className="flex items-center gap-3 p-3 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-cyan-500/50 hover:bg-zinc-900 transition-all text-left group">
+                                <button key={`potion-${item.id}`} onClick={() => push('brewing')} className="flex items-center gap-3 p-3 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-cyan-500/50 hover:bg-zinc-900 transition-all text-left group">
                                     <div className="p-2 rounded bg-zinc-900 border border-zinc-800 text-cyan-500 group-hover:text-cyan-400"><FlaskConical size={16} /></div>
                                     <div><div className="text-sm font-bold text-zinc-200 group-hover:text-white">Potion of {item.name}</div><div className="text-xs text-zinc-500">Brewing Lab</div></div>
                                 </button>
                             ))}
                             {guideResults.map((item) => (
-                                <button key={`guide-${item.id}`} onClick={() => setView('guide')} className="flex items-center gap-3 p-3 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-purple-500/50 hover:bg-zinc-900 transition-all text-left group">
+                                <button key={`guide-${item.id}`} onClick={() => push('guide')} className="flex items-center gap-3 p-3 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-purple-500/50 hover:bg-zinc-900 transition-all text-left group">
                                     <div className="p-2 rounded bg-zinc-900 border border-zinc-800 text-purple-500 group-hover:text-purple-400"><BookOpen size={16} /></div>
                                     <div><div className="text-sm font-bold text-zinc-200 group-hover:text-white">{item.name}</div><div className="text-xs text-zinc-500">Best Loadouts</div></div>
                                 </button>
@@ -295,8 +313,8 @@ const App: React.FC = () => {
                             {externalToolResults.map((item) => (
                                 <button key={`ext-${item.name}`} onClick={() => {
                                   if (item.internal) {
-                                    if (item.name === 'Brewing Lab') setView('brewing');
-                                    if (item.name === 'Pixel Circle Generator') setView('circle');
+                                    if (item.name === 'Brewing Lab') push('brewing');
+                                    if (item.name === 'Pixel Circle Generator') push('circle');
                                   } else {
                                     window.open(item.url, '_blank');
                                   }
@@ -312,7 +330,7 @@ const App: React.FC = () => {
         ) : (
           <div className="col-span-full text-center py-10 text-zinc-500">
              <p>No results found for "{searchQuery}"</p>
-             <button onClick={() => setSearchQuery('')} className="text-emerald-500 hover:underline mt-2">Clear search</button>
+             <button onClick={() => push('home', { search: '' })} className="text-emerald-500 hover:underline mt-2">Clear search</button>
           </div>
         )}
       </div>
