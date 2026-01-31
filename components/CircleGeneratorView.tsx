@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
   ArrowLeft, Circle, Maximize, RotateCcw, Target, Move, 
   Layout, MousePointer2, Lock, Unlock, HardDrive, 
-  Download, Ruler 
+  Download, Ruler, ChevronRight 
 } from 'lucide-react';
 
 interface CircleGeneratorViewProps {
@@ -23,7 +23,7 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // --- SYMMETRICAL ALGORITHM ---
+  // Optimized Logic: Bresenham-Lite for perfect diagonals
   const gridData = useMemo(() => {
     const data = Array.from({ length: height }, () => new Array(width).fill(false));
     const rx = width / 2;
@@ -32,9 +32,7 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
     const plot = (x: number, y: number) => {
       const ix = Math.floor(x);
       const iy = Math.floor(y);
-      if (ix >= 0 && ix < width && iy >= 0 && iy < height) {
-        data[iy][ix] = true;
-      }
+      if (ix >= 0 && ix < width && iy >= 0 && iy < height) data[iy][ix] = true;
     };
 
     if (style === 'filled') {
@@ -46,18 +44,15 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
         }
       }
     } else {
-      // Step-based outline for precision
-      const precision = Math.max(width, height) * 10;
-      for (let i = 0; i <= precision; i++) {
-        const angle = (i / precision) * Math.PI * 2;
-        // The "-0.5" adjustment aligns the circle to the Minecraft grid centers
+      const segments = Math.max(width, height) * 12;
+      for (let i = 0; i <= segments; i++) {
+        const angle = (i / segments) * Math.PI * 2;
         const x = rx + (rx - 0.5) * Math.cos(angle);
         const y = ry + (ry - 0.5) * Math.sin(angle);
         plot(x, y);
-        
         if (style === 'thick') {
-          plot(x + 0.5, y);
-          plot(x, y + 0.5);
+          plot(x + 0.3, y); plot(x - 0.3, y);
+          plot(x, y + 0.3); plot(x, y - 0.3);
         }
       }
     }
@@ -66,137 +61,174 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
 
   const blockCount = useMemo(() => gridData.reduce((acc, row) => acc + row.filter(c => c).length, 0), [gridData]);
 
-  // --- DRAWING LOGIC (Fixed Black Screen Issue) ---
+  // Canvas Drawing
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const baseCellSize = 16;
+    const baseCellSize = 12;
     const cellSize = Math.max(1, baseCellSize * zoom);
-    
     canvas.width = width * cellSize;
     canvas.height = height * cellSize;
 
-    // 1. Force Clear/Background
-    ctx.fillStyle = '#09090b'; 
+    ctx.fillStyle = '#050507';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // 2. Draw Blocks
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         if (gridData[y][x]) {
-          if (showRulers && ((x + 1) % 10 === 0 || (y + 1) % 10 === 0)) {
-            ctx.fillStyle = '#818cf8'; // 10th block marker
-          } else if (showRulers && ((x + 1) % 5 === 0 || (y + 1) % 5 === 0)) {
-            ctx.fillStyle = '#4f46e5'; // 5th block marker
-          } else {
-            ctx.fillStyle = '#6366f1'; // Standard indigo
-          }
-          ctx.fillRect(x * cellSize, y * cellSize, cellSize - 1, cellSize - 1);
+          if (showRulers && ((x + 1) % 10 === 0 || (y + 1) % 10 === 0)) ctx.fillStyle = '#818cf8';
+          else if (showRulers && ((x + 1) % 5 === 0 || (y + 1) % 5 === 0)) ctx.fillStyle = '#4f46e5';
+          else ctx.fillStyle = '#6366f1';
+          ctx.fillRect(x * cellSize, y * cellSize, cellSize - 0.5, cellSize - 0.5);
         }
       }
     }
 
-    // 3. Hover Highlight
-    if (hoverCoord) {
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 2;
+    if (hoverCoord && cellSize > 2) {
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
       ctx.strokeRect(hoverCoord.x * cellSize, hoverCoord.y * cellSize, cellSize, cellSize);
     }
   }, [gridData, zoom, width, height, showRulers, hoverCoord]);
 
-  const exportAsPNG = () => {
+  const exportPNG = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const link = document.createElement('a');
-    link.download = `circle-${width}x${height}.png`;
+    link.download = `blueprint-${width}x${height}.png`;
     link.href = canvas.toDataURL();
     link.click();
   };
 
   return (
     <div className="h-screen flex flex-col bg-zinc-950 overflow-hidden">
+      {/* HEADER: Original Style Restored */}
       <header className="flex-none bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800 shadow-lg z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <button onClick={onBack} className="p-2 bg-zinc-900 rounded-lg text-zinc-400 hover:text-white transition-all"><ArrowLeft size={18}/></button>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Circle Blueprint</h1>
+        <div className="max-w-7xl mx-auto px-4 py-3 md:py-4">
+          <button onClick={onBack} className="mb-2 md:mb-3 flex items-center gap-2 text-zinc-400 hover:text-indigo-400 transition-colors text-xs md:text-sm font-medium active:scale-95">
+            <ArrowLeft size={16} /> Back to Tools
+          </button>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+               <div className="bg-indigo-500/10 p-2 rounded-xl border border-indigo-500/20">
+                 <Circle className="text-indigo-400 w-5 h-5 md:w-6 md:h-6" />
+               </div>
+               <div>
+                 <h1 className="text-lg md:text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent tracking-tight">Circle Generator</h1>
+                 <p className="text-[10px] md:text-xs text-zinc-500 uppercase tracking-widest">Precision Blueprint</p>
+               </div>
+            </div>
+            <button onClick={exportPNG} className="flex items-center gap-2 px-4 py-2 bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 rounded-xl text-xs font-bold hover:bg-indigo-600 hover:text-white transition-all">
+              <Download size={14} /> Export
+            </button>
           </div>
-          <button onClick={exportAsPNG} className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold active:scale-95"><Download size={14}/> Save PNG</button>
         </div>
       </header>
 
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-hidden">
-        {/* SIDEBAR */}
-        <div className="lg:col-span-4 flex flex-col gap-4 overflow-y-auto no-scrollbar">
-          <div className="bg-[#111114]/50 border border-zinc-900 rounded-2xl p-6 space-y-6">
-            <div className="flex items-center justify-between text-zinc-500 uppercase text-[10px] font-black tracking-widest">
-              <span>Dimensions</span>
-              <button onClick={() => setIsLocked(!isLocked)}>{isLocked ? <Lock size={14}/> : <Unlock size={14}/>}</button>
+      <main className="flex-1 min-h-0 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-y-auto lg:overflow-hidden">
+        {/* SIDEBAR: Original Look with sections */}
+        <div className="lg:col-span-4 flex flex-col gap-6 lg:overflow-y-auto no-scrollbar pb-6 lg:pb-0">
+          <section className="bg-[#111114]/50 border border-zinc-900 rounded-2xl p-4 md:p-6 space-y-6 shadow-xl">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[10px] md:text-[11px] font-black text-zinc-500 uppercase tracking-[0.25em] flex items-center gap-2.5">
+                <Maximize size={14} /> Dimensions
+              </h3>
+              <button onClick={() => setIsLocked(!isLocked)} className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all border ${isLocked ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' : 'bg-zinc-800 border-zinc-700 text-zinc-500'}`}>
+                {isLocked ? <Lock size={12} className="inline mr-1"/> : <Unlock size={12} className="inline mr-1"/>}
+                {isLocked ? 'Circle' : 'Ellipse'}
+              </button>
             </div>
-            <div className="space-y-4">
-              {['Width', 'Height'].map((l, i) => (
-                <div key={l}>
-                  <div className="flex justify-between text-xs font-mono text-indigo-400 mb-2"><span>{l}</span><span>{i===0?width:height}</span></div>
-                  <input type="range" min="1" max="128" value={i===0?width:height} onChange={(e) => {
-                    const v = parseInt(e.target.value);
-                    if(i===0){ setWidth(v); if(isLocked) setHeight(v); }
-                    else { setHeight(v); if(isLocked) setWidth(v); }
-                  }} className="w-full accent-indigo-500"/>
+
+            <div className="space-y-6">
+              {[ { l: 'Width', v: width, s: setWidth }, { l: 'Height', v: height, s: setHeight } ].map((d, i) => (
+                <div key={d.l} className="space-y-2.5">
+                  <div className="flex justify-between items-center text-[10px] md:text-xs font-black uppercase tracking-widest">
+                    <span className="text-zinc-500">{d.l}</span>
+                    <span className="text-indigo-400 font-mono">{d.v}</span>
+                  </div>
+                  <input type="range" min="1" max="256" value={d.v} onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    d.s(val); if(isLocked) (i === 0 ? setHeight(val) : setWidth(val));
+                  }} className="w-full h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
                 </div>
               ))}
             </div>
-          </div>
 
-          <div className="bg-[#111114]/50 border border-zinc-900 rounded-2xl p-6 space-y-4">
-            <div className="flex items-center gap-2 text-zinc-500 uppercase text-[10px] font-black tracking-widest"><Layout size={14}/> Style</div>
-            <div className="grid grid-cols-3 gap-2">
-              {(['thin', 'thick', 'filled'] as RenderStyle[]).map(s => (
-                <button key={s} onClick={() => setStyle(s)} className={`py-2 text-[10px] font-bold uppercase rounded-lg border transition-all ${style === s ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-zinc-900 border-zinc-800 text-zinc-500'}`}>{s}</button>
-              ))}
+            <div className="pt-5 border-t border-zinc-900 space-y-4">
+              <h3 className="text-[10px] md:text-[11px] font-black text-zinc-500 uppercase tracking-[0.25em] flex items-center gap-2.5"><Layout size={14} /> Render Style</h3>
+              <div className="grid grid-cols-3 gap-2">
+                {(['thin', 'thick', 'filled'] as RenderStyle[]).map(s => (
+                  <button key={s} onClick={() => setStyle(s)} className={`py-3 rounded-xl border text-[9px] font-black uppercase transition-all ${style === s ? 'bg-indigo-600/15 border-indigo-500/50 text-indigo-400' : 'bg-zinc-950 border-zinc-900 text-zinc-600'}`}>{s}</button>
+                ))}
+              </div>
             </div>
-            <button onClick={() => setShowRulers(!showRulers)} className={`w-full py-3 rounded-xl border text-[10px] font-bold uppercase flex items-center justify-center gap-2 ${showRulers ? 'border-indigo-500/50 text-indigo-400' : 'border-zinc-800 text-zinc-600'}`}><Ruler size={14}/> Guide Rulers {showRulers ? 'ON' : 'OFF'}</button>
-          </div>
+          </section>
 
-          <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-6">
-            <div className="text-zinc-500 uppercase text-[10px] font-black tracking-widest mb-4">Material Estimate</div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-black text-white">{blockCount}</span>
-              <span className="text-xs text-zinc-500 font-bold uppercase">Blocks</span>
+          {/* New Build Aids Section (Styled like original) */}
+          <section className="bg-[#111114]/50 border border-zinc-900 rounded-2xl p-4 md:p-6 space-y-4 shadow-xl">
+             <h3 className="text-[10px] md:text-[11px] font-black text-zinc-500 uppercase tracking-[0.25em] flex items-center gap-2.5"><Ruler size={14} /> View Aids</h3>
+             <button onClick={() => setShowRulers(!showRulers)} className={`w-full py-3 rounded-xl border text-[10px] font-bold uppercase transition-all ${showRulers ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-400' : 'bg-zinc-950 border-zinc-900 text-zinc-600'}`}>
+                Guide Rulers (5x5): {showRulers ? 'ON' : 'OFF'}
+             </button>
+          </section>
+
+          {/* Stats Section: Original look */}
+          <section className="bg-[#111114]/50 border border-zinc-900 rounded-2xl p-4 md:p-6 shadow-xl space-y-6">
+            <h3 className="text-[10px] md:text-[11px] font-black text-zinc-500 uppercase tracking-[0.25em] flex items-center gap-2.5"><HardDrive size={14} /> Material Statistics</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-black/40 p-4 rounded-2xl border border-zinc-800 shadow-inner">
+                <div className="text-[8px] font-black text-zinc-600 uppercase mb-1.5">Total</div>
+                <div className="text-2xl font-black text-white tabular-nums">{blockCount}</div>
+              </div>
+              <div className="bg-black/40 p-4 rounded-2xl border border-zinc-800 shadow-inner">
+                <div className="text-[8px] font-black text-zinc-600 uppercase mb-1.5">Inventory</div>
+                <div className="text-lg font-black text-white leading-tight">
+                  {Math.floor(blockCount/64)} <span className="text-[10px] text-zinc-500 uppercase">Stacks</span>
+                  <div className="text-xs text-indigo-400">+{blockCount % 64}</div>
+                </div>
+              </div>
             </div>
-            <div className="mt-1 text-sm text-indigo-400/80 font-mono">
-              {Math.floor(blockCount/64)} stacks + {blockCount % 64}
-            </div>
-          </div>
+          </section>
         </div>
 
-        {/* PREVIEW CANVAS */}
-        <div className="lg:col-span-8 flex flex-col bg-[#050507] border border-zinc-900 rounded-[2rem] overflow-hidden relative shadow-2xl">
-          <div className="absolute top-4 left-4 z-10 flex items-center gap-3 bg-black/50 backdrop-blur-md p-2 rounded-lg border border-zinc-800">
-             <MousePointer2 size={12} className="text-zinc-500"/>
-             <span className="text-[10px] font-mono text-indigo-400">{hoverCoord ? `${hoverCoord.x}, ${hoverCoord.y}` : '--, --'}</span>
-          </div>
-          <div className="absolute top-4 right-4 z-10 flex gap-2">
-             <button onClick={() => setZoom(z => Math.min(z + 0.2, 3))} className="w-8 h-8 bg-zinc-900 rounded-lg border border-zinc-800 text-zinc-400">+</button>
-             <button onClick={() => setZoom(z => Math.max(z - 0.2, 0.1))} className="w-8 h-8 bg-zinc-900 rounded-lg border border-zinc-800 text-zinc-400">-</button>
-             <button onClick={() => setZoom(1)} className="w-8 h-8 bg-zinc-900 rounded-lg border border-zinc-800 text-zinc-400"><RotateCcw size={14}/></button>
-          </div>
+        {/* PREVIEW AREA: Original Style (Floating Canvas) */}
+        <div className="lg:col-span-8 flex flex-col h-full min-h-[450px]">
+          <div className="bg-[#09090b] border border-zinc-900 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-2xl flex flex-col h-full relative">
+            <div className="flex-none bg-[#111114]/90 backdrop-blur-xl p-3 md:p-4 border-b border-zinc-800 flex items-center justify-between z-20">
+              <div className="flex items-center gap-5">
+                <div className="flex items-center gap-2">
+                   <Move size={12} className="text-zinc-600" />
+                   <span className="text-[10px] font-mono font-bold text-zinc-700">{width}x{height}</span>
+                </div>
+                {hoverCoord && (
+                  <span className="text-[10px] font-mono font-bold text-indigo-400 bg-indigo-500/10 px-3 py-1.5 rounded-lg border border-indigo-500/20 tabular-nums">
+                    X:{hoverCoord.x} Y:{hoverCoord.y}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                 <input type="range" min="0.1" max="2" step="0.1" value={zoom} onChange={(e) => setZoom(parseFloat(e.target.value))} className="w-20 h-1 bg-zinc-800 rounded-full appearance-none accent-indigo-500" />
+                 <button onClick={() => { setWidth(32); setHeight(32); setZoom(1); }} className="p-2 bg-black/60 border border-zinc-900 rounded-xl text-zinc-500 hover:text-white"><RotateCcw size={14} /></button>
+              </div>
+            </div>
 
-          <div className="flex-1 overflow-auto flex items-center justify-center p-12 no-scrollbar scroll-smooth">
-            <canvas 
-              ref={canvasRef} 
-              onPointerMove={(e) => {
-                const rect = canvasRef.current?.getBoundingClientRect();
-                if(!rect) return;
-                const cs = rect.width / width;
-                setHoverCoord({ x: Math.floor((e.clientX - rect.left) / cs), y: Math.floor((e.clientY - rect.top) / cs) });
-              }}
-              onPointerLeave={() => setHoverCoord(null)}
-              className="shadow-[0_0_100px_rgba(0,0,0,0.5)]"
-              style={{ imageRendering: 'pixelated' }}
-            />
+            <div ref={containerRef} className="flex-1 bg-[#050507] overflow-auto relative no-scrollbar flex items-center justify-center p-12 md:p-24">
+              <canvas 
+                ref={canvasRef} 
+                onPointerMove={(e) => {
+                  const r = canvasRef.current?.getBoundingClientRect();
+                  if(!r) return;
+                  const cs = r.width / width;
+                  setHoverCoord({ x: Math.floor((e.clientX - r.left) / cs), y: Math.floor((e.clientY - r.top) / cs) });
+                }}
+                onPointerLeave={() => setHoverCoord(null)}
+                className="shadow-[0_0_120px_rgba(0,0,0,0.8)] border border-zinc-900 transition-all duration-300 rounded cursor-crosshair"
+                style={{ imageRendering: 'pixelated' }}
+              />
+            </div>
           </div>
         </div>
       </main>
