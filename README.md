@@ -29,8 +29,8 @@ It focuses on quality-of-life features such as enchantment planning, XP optimiza
   - Useful for long-term worlds and projects
 
 - **More Tools**
+  - Brewing Lab and Pixel circle generator 
   - Seed tools, armor trims, banners
-  - Block palettes
   - Command generators and more
 
 ---
