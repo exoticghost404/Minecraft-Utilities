@@ -1,8 +1,9 @@
+
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
-  ArrowLeft, Circle, Maximize, RotateCcw, Target, Move, 
-  Layout, MousePointer2, Lock, Unlock, HardDrive, 
-  Download, Ruler, Minus, Plus 
+  ArrowLeft, Circle, Maximize, RotateCcw, Move, 
+  Layout,Lock, Unlock, HardDrive, 
+  Download, Ruler
 } from 'lucide-react';
 
 interface CircleGeneratorViewProps {
