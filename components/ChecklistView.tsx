@@ -118,7 +118,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({ onBack, initialSea
                  <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
                   Checklist
                  </h1>
-                 <p className="text-xs text-zinc-400 hidden sm:block">Track collection & progression</p>
+                 <p className="text-xs text-zinc-400">Track collection & progression</p>
                </div>
             </div>
 
