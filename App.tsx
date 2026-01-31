@@ -22,8 +22,8 @@ const MENU_ITEMS = [
     view: 'checklist',
     theme: {
       hoverBorder: 'hover:border-emerald-500/50',
-      hoverShadow: 'hover:shadow-[0_0_30px_rgba(16,185,129,0.1)]',
-      gradient: 'from-emerald-500/5',
+      hoverShadow: 'hover:shadow-[0_0_40px_rgba(16,185,129,0.15)]',
+      gradient: 'from-emerald-500/10',
       iconBg: 'bg-emerald-500/10',
       iconBorder: 'border-emerald-500/20',
       iconColor: 'text-emerald-400',
@@ -38,8 +38,8 @@ const MENU_ITEMS = [
     view: 'guide',
     theme: {
       hoverBorder: 'hover:border-purple-500/50',
-      hoverShadow: 'hover:shadow-[0_0_30px_rgba(168,85,247,0.1)]',
-      gradient: 'from-purple-500/5',
+      hoverShadow: 'hover:shadow-[0_0_40px_rgba(168,85,247,0.15)]',
+      gradient: 'from-purple-500/10',
       iconBg: 'bg-purple-500/10',
       iconBorder: 'border-purple-500/20',
       iconColor: 'text-purple-400',
@@ -54,8 +54,8 @@ const MENU_ITEMS = [
     view: 'calculator',
     theme: {
       hoverBorder: 'hover:border-amber-500/50',
-      hoverShadow: 'hover:shadow-[0_0_30px_rgba(245,158,11,0.1)]',
-      gradient: 'from-amber-500/5',
+      hoverShadow: 'hover:shadow-[0_0_40px_rgba(245,158,11,0.15)]',
+      gradient: 'from-amber-500/10',
       iconBg: 'bg-amber-500/10',
       iconBorder: 'border-amber-500/20',
       iconColor: 'text-amber-400',
@@ -70,8 +70,8 @@ const MENU_ITEMS = [
     view: 'nether',
     theme: {
       hoverBorder: 'hover:border-red-500/50',
-      hoverShadow: 'hover:shadow-[0_0_30_px_rgba(239,68,68,0.1)]',
-      gradient: 'from-red-500/5',
+      hoverShadow: 'hover:shadow-[0_0_40px_rgba(239,68,68,0.15)]',
+      gradient: 'from-red-500/10',
       iconBg: 'bg-red-500/10',
       iconBorder: 'border-red-500/20',
       iconColor: 'text-red-400',
@@ -86,8 +86,8 @@ const MENU_ITEMS = [
     view: 'notes',
     theme: {
       hoverBorder: 'hover:border-blue-500/50',
-      hoverShadow: 'hover:shadow-[0_0_30px_rgba(59,130,246,0.1)]',
-      gradient: 'from-blue-500/5',
+      hoverShadow: 'hover:shadow-[0_0_40px_rgba(59,130,246,0.15)]',
+      gradient: 'from-blue-500/10',
       iconBg: 'bg-blue-500/10',
       iconBorder: 'border-blue-500/20',
       iconColor: 'text-blue-400',
@@ -97,13 +97,13 @@ const MENU_ITEMS = [
   {
     id: 'tools',
     title: 'More Tools',
-    description: 'Brewing lab, seed maps, armor trims, banners, and other utilities.',
+    description: 'Brewing, seed maps, armor trims, and more.',
     icon: Globe,
     view: 'tools',
     theme: {
       hoverBorder: 'hover:border-indigo-500/50',
-      hoverShadow: 'hover:shadow-[0_0_30px_rgba(99,102,241,0.1)]',
-      gradient: 'from-indigo-500/5',
+      hoverShadow: 'hover:shadow-[0_0_40px_rgba(99,102,241,0.15)]',
+      gradient: 'from-indigo-500/10',
       iconBg: 'bg-indigo-500/10',
       iconBorder: 'border-indigo-500/20',
       iconColor: 'text-indigo-400',
@@ -140,7 +140,11 @@ const App: React.FC = () => {
   }, []);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+        // Fallback for when prompt isn't available (e.g. already installed or not supported)
+        alert("If you're on mobile, use 'Add to Home Screen' in your browser menu. If on desktop, look for the install icon in the address bar!");
+        return;
+    }
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === 'accepted') setDeferredPrompt(null);
@@ -189,48 +193,62 @@ const App: React.FC = () => {
   const hasResults = menuResults.length > 0 || enchantResults.length > 0 || guideResults.length > 0 || externalToolResults.length > 0 || potionResults.length > 0;
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-zinc-950 to-black text-zinc-100 relative">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-zinc-950 text-zinc-100 relative overflow-x-hidden">
       
-      <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
-        {deferredPrompt && (
-          <button
-            onClick={handleInstallClick}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 font-bold border border-emerald-400/30"
-          >
-            <Download size={18} /> <span className="hidden sm:inline">Install App</span>
-          </button>
-        )}
+      {/* BACKGROUND DECORATION */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-zinc-950 to-black" />
+         {/* Subtle Grid Pattern */}
+         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+         {/* Decorative Glows */}
+         <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-500/10 blur-[100px] rounded-full" />
+         <div className="absolute top-1/2 -right-24 w-80 h-80 bg-purple-500/5 blur-[100px] rounded-full" />
+      </div>
+
+      {/* TOP UTILITY BAR */}
+      <div className="fixed top-6 right-6 z-50 flex items-center gap-3">
+        <button
+          onClick={handleInstallClick}
+          className="p-3 rounded-2xl bg-zinc-900/80 backdrop-blur-xl border border-emerald-500/20 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 hover:border-emerald-500/40 transition-all shadow-[0_0_20px_rgba(16,185,129,0.1)] group active:scale-90"
+          title="Install App"
+        >
+          <Download size={22} className="group-hover:scale-110 transition-transform" />
+        </button>
         <button
           onClick={() => setView('settings')}
-          className="p-2.5 rounded-lg bg-zinc-800/80 border border-zinc-700 hover:bg-zinc-700 hover:text-white text-zinc-400 transition-all shadow-lg"
+          className="p-3 rounded-2xl bg-zinc-900/80 backdrop-blur-xl border border-zinc-700/50 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all shadow-xl active:scale-90"
           title="Settings & Backup"
         >
-          <Settings size={20} />
+          <Settings size={22} />
         </button>
       </div>
 
-      <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-3xl mt-8">
-        <div className="inline-block p-4 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-          <Sparkles size={48} className="text-emerald-400" />
+      {/* HERO SECTION */}
+      <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-4xl mt-16 relative z-10">
+        <div className="inline-block p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-2xl border border-zinc-800 mb-8 shadow-2xl relative group">
+          <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <Sparkles size={56} className="text-emerald-400 relative z-10 animate-pulse" />
         </div>
-        <h1 className="text-4xl md:text-6xl font-black bg-gradient-to-br from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-4 tracking-tight">
+        
+        <h1 className="text-5xl md:text-7xl font-black bg-gradient-to-b from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent mb-4 tracking-tighter">
           Minecraft Utility
         </h1>
-        <p className="text-zinc-400 max-w-md mx-auto text-lg mb-8">
-          All-in-one companion for survival efficiency.
+        <p className="text-zinc-500 max-w-md mx-auto text-lg mb-10 font-medium">
+          Efficiency refined. Your ultimate companion for every survival world.
         </p>
 
+        {/* SEARCH BAR */}
         <div className="relative max-w-2xl mx-auto z-20 group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 rounded-2xl blur-lg opacity-50 group-hover:opacity-100 transition duration-500" />
-            <div className="relative flex items-center bg-zinc-900/80 backdrop-blur-xl border border-zinc-700/50 rounded-2xl shadow-2xl transition-all duration-300 group-focus-within:border-emerald-500/50 group-focus-within:ring-1 group-focus-within:ring-emerald-500/20">
-                <div className="pl-5 text-zinc-500 group-focus-within:text-emerald-400 transition-colors">
+            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/30 to-blue-500/30 rounded-3xl blur-xl opacity-40 group-hover:opacity-100 transition duration-1000" />
+            <div className="relative flex items-center bg-zinc-900/60 backdrop-blur-3xl border border-zinc-700/50 rounded-2xl shadow-2xl transition-all duration-300 group-focus-within:border-emerald-500/50 group-focus-within:bg-zinc-900/80 group-focus-within:ring-4 group-focus-within:ring-emerald-500/10">
+                <div className="pl-6 text-zinc-500 group-focus-within:text-emerald-400 transition-colors">
                     <Search size={24} />
                 </div>
                 <input
                     ref={searchInputRef}
                     type="text"
-                    placeholder="Search enchants, potions, tools..."
-                    className="w-full bg-transparent text-zinc-100 py-4 px-4 text-lg outline-none placeholder-zinc-500"
+                    placeholder="Quick search... (Press '/' to focus)"
+                    className="w-full bg-transparent text-zinc-100 py-5 px-5 text-lg outline-none placeholder-zinc-600 font-medium"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -238,28 +256,31 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl w-full">
+      {/* MAIN CONTENT GRID */}
+      <div className="max-w-7xl w-full relative z-10">
          {hasResults ? (
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-20">
                 {menuResults.length > 0 && (
                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {menuResults.map((item) => (
                             <button
                             key={item.id}
                             onClick={() => setView(item.view as ViewMode)}
-                            className={`group relative p-8 rounded-2xl bg-zinc-900/50 border border-zinc-800 ${item.theme.hoverBorder} hover:bg-zinc-900 transition-all duration-300 text-left flex flex-col h-full ${item.theme.hoverShadow} overflow-hidden`}
+                            className={`group relative p-8 rounded-[2rem] bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 ${item.theme.hoverBorder} hover:bg-zinc-900/60 transition-all duration-500 text-left flex flex-col h-full ${item.theme.hoverShadow} overflow-hidden hover:-translate-y-2 active:scale-[0.98]`}
                             >
-                            <div className={`absolute inset-0 bg-gradient-to-br ${item.theme.gradient} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity`} />
-                            <div className="relative z-10 flex items-start justify-between mb-8">
-                                <div className={`p-3 ${item.theme.iconBg} rounded-xl border ${item.theme.iconBorder} group-hover:scale-110 transition-transform duration-300`}>
-                                <item.icon size={32} className={item.theme.iconColor} />
+                            <div className={`absolute inset-0 bg-gradient-to-br ${item.theme.gradient} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                            
+                            <div className="relative z-10 flex items-start justify-between mb-10">
+                                <div className={`p-4 ${item.theme.iconBg} rounded-2xl border ${item.theme.iconBorder} group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl`}>
+                                <item.icon size={36} className={item.theme.iconColor} />
                                 </div>
                             </div>
+                            
                             <div className="relative z-10 mt-auto">
-                                <h2 className={`text-xl font-bold text-white mb-2 ${item.theme.titleHover} transition-colors`}>
+                                <h2 className={`text-2xl font-black text-white mb-3 ${item.theme.titleHover} transition-colors tracking-tight`}>
                                 {item.title}
                                 </h2>
-                                <p className="text-zinc-400 text-sm leading-relaxed">
+                                <p className="text-zinc-500 text-sm leading-relaxed font-medium group-hover:text-zinc-400 transition-colors">
                                 {item.description}
                                 </p>
                             </div>
@@ -268,28 +289,29 @@ const App: React.FC = () => {
                     </div>
                 )}
 
+                {/* SEARCH RESULTS OVERLAY STYLE */}
                 {(enchantResults.length > 0 || guideResults.length > 0 || externalToolResults.length > 0 || potionResults.length > 0) && (
-                    <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6">
-                        <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-                             <Search size={14} /> Search Results
+                    <div className="bg-zinc-900/50 backdrop-blur-2xl border border-zinc-800 rounded-[2.5rem] p-8 shadow-3xl">
+                        <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em] mb-8 flex items-center gap-3 ml-2">
+                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Integrated Search Results
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {enchantResults.map((item) => (
-                                <button key={`ench-${item.id}`} onClick={() => setView('checklist')} className="flex items-center gap-3 p-3 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-emerald-500/50 hover:bg-zinc-900 transition-all text-left group">
-                                    <div className="p-2 rounded bg-zinc-900 border border-zinc-800 text-emerald-500 group-hover:text-emerald-400"><CheckSquare size={16} /></div>
-                                    <div><div className="text-sm font-bold text-zinc-200 group-hover:text-white">{item.name}</div><div className="text-xs text-zinc-500">Checklist • {item.categoryName}</div></div>
+                                <button key={`ench-${item.id}`} onClick={() => setView('checklist')} className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-950/50 border border-zinc-800 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all text-left group">
+                                    <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-emerald-500 group-hover:text-emerald-400 group-hover:scale-110 transition-all"><CheckSquare size={18} /></div>
+                                    <div><div className="text-sm font-bold text-zinc-200 group-hover:text-white">{item.name}</div><div className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">Checklist • {item.categoryName}</div></div>
                                 </button>
                             ))}
                             {potionResults.map((item) => (
-                                <button key={`potion-${item.id}`} onClick={() => { setView('brewing'); setSearchQuery(''); }} className="flex items-center gap-3 p-3 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-cyan-500/50 hover:bg-zinc-900 transition-all text-left group">
-                                    <div className="p-2 rounded bg-zinc-900 border border-zinc-800 text-cyan-500 group-hover:text-cyan-400"><FlaskConical size={16} /></div>
-                                    <div><div className="text-sm font-bold text-zinc-200 group-hover:text-white">Potion of {item.name}</div><div className="text-xs text-zinc-500">Brewing Lab</div></div>
+                                <button key={`potion-${item.id}`} onClick={() => { setView('brewing'); setSearchQuery(''); }} className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-950/50 border border-zinc-800 hover:border-cyan-500/50 hover:bg-cyan-500/5 transition-all text-left group">
+                                    <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-cyan-500 group-hover:text-cyan-400 group-hover:scale-110 transition-all"><FlaskConical size={18} /></div>
+                                    <div><div className="text-sm font-bold text-zinc-200 group-hover:text-white">Potion of {item.name}</div><div className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">Brewing Lab</div></div>
                                 </button>
                             ))}
                             {guideResults.map((item) => (
-                                <button key={`guide-${item.id}`} onClick={() => setView('guide')} className="flex items-center gap-3 p-3 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-purple-500/50 hover:bg-zinc-900 transition-all text-left group">
-                                    <div className="p-2 rounded bg-zinc-900 border border-zinc-800 text-purple-500 group-hover:text-purple-400"><BookOpen size={16} /></div>
-                                    <div><div className="text-sm font-bold text-zinc-200 group-hover:text-white">{item.name}</div><div className="text-xs text-zinc-500">Best Loadouts</div></div>
+                                <button key={`guide-${item.id}`} onClick={() => setView('guide')} className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-950/50 border border-zinc-800 hover:border-purple-500/50 hover:bg-purple-500/5 transition-all text-left group">
+                                    <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-purple-500 group-hover:text-purple-400 group-hover:scale-110 transition-all"><BookOpen size={18} /></div>
+                                    <div><div className="text-sm font-bold text-zinc-200 group-hover:text-white">{item.name}</div><div className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">Best Loadouts</div></div>
                                 </button>
                             ))}
                             {externalToolResults.map((item) => (
@@ -300,9 +322,9 @@ const App: React.FC = () => {
                                   } else {
                                     window.open(item.url, '_blank');
                                   }
-                                }} className="flex items-center gap-3 p-3 rounded-lg bg-zinc-950 border border-zinc-800 hover:border-indigo-500/50 hover:bg-zinc-900 transition-all text-left group">
-                                    <div className="p-2 rounded bg-zinc-900 border border-zinc-800 text-indigo-500 group-hover:text-indigo-400"><Globe size={16} /></div>
-                                    <div><div className="text-sm font-bold text-zinc-200 group-hover:text-white">{item.name}</div><div className="text-xs text-zinc-500">{item.internal ? 'Native Tool' : 'External Tool'}</div></div>
+                                }} className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-950/50 border border-zinc-800 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all text-left group">
+                                    <div className="p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-indigo-500 group-hover:text-indigo-400 group-hover:scale-110 transition-all"><Globe size={18} /></div>
+                                    <div><div className="text-sm font-bold text-zinc-200 group-hover:text-white">{item.name}</div><div className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">{item.internal ? 'Native Tool' : 'External Tool'}</div></div>
                                 </button>
                             ))}
                         </div>
@@ -310,22 +332,27 @@ const App: React.FC = () => {
                 )}
             </div>
         ) : (
-          <div className="col-span-full text-center py-10 text-zinc-500">
-             <p>No results found for "{searchQuery}"</p>
-             <button onClick={() => setSearchQuery('')} className="text-emerald-500 hover:underline mt-2">Clear search</button>
+          <div className="col-span-full text-center py-20 text-zinc-500">
+             <div className="bg-zinc-900/50 p-8 rounded-full inline-block border border-zinc-800 mb-6">
+                <Search size={48} className="opacity-20" />
+             </div>
+             <p className="text-xl font-bold">No results found for "{searchQuery}"</p>
+             <button onClick={() => setSearchQuery('')} className="text-emerald-500 hover:text-emerald-400 font-bold mt-4 underline decoration-2 underline-offset-4">Clear search</button>
           </div>
         )}
       </div>
 
-      <footer className="mt-16 mb-8 text-center space-y-4">
-        <p className="text-zinc-600 text-sm">Minecraft Utility © {new Date().getFullYear()}</p>
-        <div className="flex flex-col items-center gap-3">
-            <p className="text-zinc-700 text-xs flex items-center justify-center gap-1">Made by <span className="text-emerald-500/60 font-medium">Exoticghost404</span></p>
-            <div className="flex items-center gap-4 text-zinc-600">
-                <a href="https://www.youtube.com/channel/UCs9-IGmuj-ogpe5_jlg7xjw?sub_confirmation=1" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 hover:scale-110 transition-all" title="YouTube"><Youtube size={18} /></a>
-                <a href="https://www.twitch.tv/exoticghost404" target="_blank" rel="noopener noreferrer" className="hover:text-purple-500 hover:scale-110 transition-all" title="Twitch"><Twitch size={18} /></a>
-                <a href="https://www.instagram.com/exoticghost404" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 hover:scale-110 transition-all" title="Instagram"><Instagram size={18} /></a>
+      {/* FOOTER */}
+      <footer className="mt-auto mb-12 text-center space-y-6 relative z-10">
+        <div className="h-px w-24 bg-gradient-to-r from-transparent via-zinc-800 to-transparent mx-auto mb-10" />
+        <div className="flex flex-col items-center gap-4">
+            <p className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.4em]">Designed by <span className="text-emerald-500/80">Exoticghost404</span></p>
+            <div className="flex items-center gap-6 text-zinc-600 bg-zinc-900/50 backdrop-blur-xl px-6 py-3 rounded-full border border-zinc-800">
+                <a href="https://www.youtube.com/channel/UCs9-IGmuj-ogpe5_jlg7xjw?sub_confirmation=1" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 hover:scale-125 transition-all" title="YouTube"><Youtube size={20} /></a>
+                <a href="https://www.twitch.tv/exoticghost404" target="_blank" rel="noopener noreferrer" className="hover:text-purple-500 hover:scale-125 transition-all" title="Twitch"><Twitch size={20} /></a>
+                <a href="https://www.instagram.com/exoticghost404" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 hover:scale-125 transition-all" title="Instagram"><Instagram size={20} /></a>
             </div>
+            <p className="text-zinc-700 text-[10px] font-bold">© {new Date().getFullYear()} Minecraft Utility Hub</p>
         </div>
       </footer>
     </div>
