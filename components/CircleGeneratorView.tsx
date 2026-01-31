@@ -9,7 +9,7 @@ interface CircleGeneratorViewProps {
   onBack: () => void;
 }
 
-type RenderStyle = 'thin' | 'thick' | 'filled';
+type RenderStyle = 'thi' | 'thick' | 'filled';
 
 export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack }) => {
   const [width, setWidth] = useState(32);
