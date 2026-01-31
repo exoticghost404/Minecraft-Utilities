@@ -1,53 +1,68 @@
-const CACHE_NAME = 'mc-utility-v1';
-const STATIC_ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  'https://cdn.tailwindcss.com'
+const CACHE_NAME = 'mc-util-v5';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/manifest.json'
 ];
 
-// On install, cache the core engine
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
-    })
-  );
+// Install: Cache core files immediately
+self.addEventListener('install', event => {
   self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+  );
 });
 
-// Clean up old caches
-self.addEventListener('activate', (event) => {
+// Activate: Clean up old caches
+self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then((keys) => {
+    caches.keys().then(cacheNames => {
       return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
       );
     })
   );
-  self.clients.claim();
+  return self.clients.claim();
 });
 
-// Stale-while-revalidate strategy
-self.addEventListener('fetch', (event) => {
+// Fetch: Cache First strategy with network fallback/update
+self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.match(event.request).then((cachedResponse) => {
-        const fetchedResponse = fetch(event.request).then((networkResponse) => {
-          // Cache the new response if it's valid
-          if (networkResponse && networkResponse.status === 200) {
-            cache.put(event.request, networkResponse.clone());
-          }
-          return networkResponse;
-        }).catch(() => {
-          // If network fails and no cache, we're truly offline
-          return cachedResponse;
-        });
+    caches.match(event.request)
+      .then(response => {
+        // Return cached response if found
+        if (response) {
+          return response;
+        }
 
-        return cachedResponse || fetchedResponse;
-      });
-    })
+        // Otherwise network request
+        return fetch(event.request).then(
+          function(response) {
+            // Check if valid response
+            if(!response || response.status !== 200 || (response.type !== 'basic' && response.type !== 'cors')) {
+              return response;
+            }
+
+            var responseToCache = response.clone();
+
+            caches.open(CACHE_NAME)
+              .then(function(cache) {
+                cache.put(event.request, responseToCache);
+              });
+
+            return response;
+          }
+        ).catch(() => {
+           console.log('Offline: Asset not in cache');
+        });
+      })
   );
 });
