@@ -2,7 +2,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
   ArrowLeft, Circle, Maximize, RotateCcw, Target, Move, 
   Layout, MousePointer2, Lock, Unlock, HardDrive, 
-  Download, Ruler, ChevronRight 
+  Download, Ruler, Minus, Plus 
 } from 'lucide-react';
 
 interface CircleGeneratorViewProps {
@@ -17,13 +17,16 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
   const [style, setStyle] = useState<RenderStyle>('thin');
   const [isLocked, setIsLocked] = useState(true);
   const [showRulers, setShowRulers] = useState(true);
+  
+  // State for Zoom
   const [zoom, setZoom] = useState(1);
+  
   const [hoverCoord, setHoverCoord] = useState<{ x: number, y: number } | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Optimized Logic: Bresenham-Lite for perfect diagonals
+  // --- LOGIC: Grid Calculation ---
   const gridData = useMemo(() => {
     const data = Array.from({ length: height }, () => new Array(width).fill(false));
     const rx = width / 2;
@@ -61,7 +64,7 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
 
   const blockCount = useMemo(() => gridData.reduce((acc, row) => acc + row.filter(c => c).length, 0), [gridData]);
 
-  // Canvas Drawing
+  // --- LOGIC: Canvas Rendering ---
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -73,9 +76,11 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
     canvas.width = width * cellSize;
     canvas.height = height * cellSize;
 
+    // Draw Background
     ctx.fillStyle = '#050507';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // Draw Blocks
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         if (gridData[y][x]) {
@@ -87,6 +92,7 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
       }
     }
 
+    // Draw Highlight
     if (hoverCoord && cellSize > 2) {
       ctx.strokeStyle = '#fff';
       ctx.lineWidth = 1.5;
@@ -103,9 +109,16 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
     link.click();
   };
 
+  // --- LOGIC: Zoom Handler ---
+  const handleManualZoom = (val: number) => {
+    // Clamp between 10% and 300%
+    const newZoom = Math.max(0.1, Math.min(3.0, val / 100));
+    setZoom(newZoom);
+  };
+
   return (
-    <div className="h-screen flex flex-col bg-zinc-950 overflow-hidden">
-      {/* HEADER: Original Style Restored */}
+    <div className="h-screen flex flex-col bg-zinc-950 overflow-hidden font-sans">
+      {/* HEADER */}
       <header className="flex-none bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800 shadow-lg z-40">
         <div className="max-w-7xl mx-auto px-4 py-3 md:py-4">
           <button onClick={onBack} className="mb-2 md:mb-3 flex items-center gap-2 text-zinc-400 hover:text-indigo-400 transition-colors text-xs md:text-sm font-medium active:scale-95">
@@ -129,7 +142,7 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
       </header>
 
       <main className="flex-1 min-h-0 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-y-auto lg:overflow-hidden">
-        {/* SIDEBAR: Original Look with sections */}
+        {/* SIDEBAR */}
         <div className="lg:col-span-4 flex flex-col gap-6 lg:overflow-y-auto no-scrollbar pb-6 lg:pb-0">
           <section className="bg-[#111114]/50 border border-zinc-900 rounded-2xl p-4 md:p-6 space-y-6 shadow-xl">
             <div className="flex items-center justify-between">
@@ -167,7 +180,6 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
             </div>
           </section>
 
-          {/* New Build Aids Section (Styled like original) */}
           <section className="bg-[#111114]/50 border border-zinc-900 rounded-2xl p-4 md:p-6 space-y-4 shadow-xl">
              <h3 className="text-[10px] md:text-[11px] font-black text-zinc-500 uppercase tracking-[0.25em] flex items-center gap-2.5"><Ruler size={14} /> View Aids</h3>
              <button onClick={() => setShowRulers(!showRulers)} className={`w-full py-3 rounded-xl border text-[10px] font-bold uppercase transition-all ${showRulers ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-400' : 'bg-zinc-950 border-zinc-900 text-zinc-600'}`}>
@@ -175,7 +187,6 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
              </button>
           </section>
 
-          {/* Stats Section: Original look */}
           <section className="bg-[#111114]/50 border border-zinc-900 rounded-2xl p-4 md:p-6 shadow-xl space-y-6">
             <h3 className="text-[10px] md:text-[11px] font-black text-zinc-500 uppercase tracking-[0.25em] flex items-center gap-2.5"><HardDrive size={14} /> Material Statistics</h3>
             <div className="grid grid-cols-2 gap-3">
@@ -194,9 +205,11 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
           </section>
         </div>
 
-        {/* PREVIEW AREA: Original Style (Floating Canvas) */}
+        {/* PREVIEW AREA */}
         <div className="lg:col-span-8 flex flex-col h-full min-h-[450px]">
           <div className="bg-[#09090b] border border-zinc-900 rounded-[1.5rem] md:rounded-[2rem] overflow-hidden shadow-2xl flex flex-col h-full relative">
+            
+            {/* CANVAS HEADER / TOOLBAR */}
             <div className="flex-none bg-[#111114]/90 backdrop-blur-xl p-3 md:p-4 border-b border-zinc-800 flex items-center justify-between z-20">
               <div className="flex items-center gap-5">
                 <div className="flex items-center gap-2">
@@ -209,9 +222,30 @@ export const CircleGeneratorView: React.FC<CircleGeneratorViewProps> = ({ onBack
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-3">
-                 <input type="range" min="0.1" max="2" step="0.1" value={zoom} onChange={(e) => setZoom(parseFloat(e.target.value))} className="w-20 h-1 bg-zinc-800 rounded-full appearance-none accent-indigo-500" />
-                 <button onClick={() => { setWidth(32); setHeight(32); setZoom(1); }} className="p-2 bg-black/60 border border-zinc-900 rounded-xl text-zinc-500 hover:text-white"><RotateCcw size={14} /></button>
+
+              {/* NEW ZOOM CONTROLS */}
+              <div className="flex items-center gap-4">
+                 <div className="flex items-center gap-3 bg-zinc-900/50 p-1 rounded-lg border border-zinc-800/50">
+                    <div className="flex items-center gap-1 pl-2">
+                      <input 
+                        type="number" 
+                        value={Math.round(zoom * 100)} 
+                        onChange={(e) => handleManualZoom(parseInt(e.target.value))}
+                        className="bg-transparent text-indigo-400 font-mono text-xs w-8 text-right focus:outline-none border-b border-transparent focus:border-indigo-500 transition-colors"
+                      />
+                      <span className="text-[10px] text-zinc-600 font-bold pr-2">%</span>
+                    </div>
+                    <div className="h-4 w-[1px] bg-zinc-800"></div>
+                    <input 
+                      type="range" min="0.1" max="2" step="0.1" 
+                      value={zoom} 
+                      onChange={(e) => setZoom(parseFloat(e.target.value))} 
+                      className="w-20 h-1 bg-zinc-800 rounded-full appearance-none accent-indigo-500 cursor-pointer mr-2" 
+                    />
+                 </div>
+                 <button onClick={() => { setWidth(32); setHeight(32); setZoom(1); }} className="p-2 bg-black/60 border border-zinc-900 rounded-xl text-zinc-500 hover:text-white transition-all active:scale-95" title="Reset View">
+                    <RotateCcw size={14} />
+                 </button>
               </div>
             </div>
 
