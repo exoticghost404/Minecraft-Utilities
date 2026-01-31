@@ -14,10 +14,10 @@
       "purpose": "any maskable"
     },
     {
-        "src": "https://cdn-icons-png.flaticon.com/512/1314/1314382.png",
-        "sizes": "512x512",
-        "type": "image/png",
-        "purpose": "any maskable"
+      "src": "https://cdn-icons-png.flaticon.com/512/1314/1314382.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
