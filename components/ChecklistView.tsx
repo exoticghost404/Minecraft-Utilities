@@ -247,7 +247,7 @@ export const ChecklistView: React.FC<ChecklistViewProps> = ({ onBack, initialSea
         onClose={() => setShowResetModal(false)}
         onConfirm={handleResetConfirm}
         title="Reset Progress?"
-        message="Are you sure? This will clear all checked items in your survival checklist."
+        message="Are you sure? This will clear all checked items in your checklist."
       />
     </div>
   );
