@@ -1,65 +1,41 @@
-const CACHE_NAME = 'mc-util-v7';
+
+const CACHE_NAME = 'mc-util-v8';
 const urlsToCache = [
   './',
-  './index.html',
-  './manifest.json',
-  './e.png'
+  'index.html',
+  'manifest.json',
+  'e.png'
 ];
 
-// Install: Cache core files using relative paths
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
+      .then(cache => {
+        // We use a map to catch errors on individual files so one failure doesn't break the whole install
+        return Promise.allSettled(
+          urlsToCache.map(url => cache.add(url))
+        );
+      })
   );
 });
 
-// Activate: Clean up old caches
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
+        cacheNames.filter(name => name !== CACHE_NAME).map(name => caches.delete(name))
       );
     })
   );
   return self.clients.claim();
 });
 
-// Fetch: Cache First strategy with network fallback
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
-
+  
   event.respondWith(
     caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-
-        return fetch(event.request).then(
-          function(response) {
-            if(!response || response.status !== 200 || (response.type !== 'basic' && response.type !== 'cors')) {
-              return response;
-            }
-
-            var responseToCache = response.clone();
-            caches.open(CACHE_NAME)
-              .then(function(cache) {
-                cache.put(event.request, responseToCache);
-              });
-
-            return response;
-          }
-        ).catch(() => {
-           console.log('Offline: Asset not in cache');
-        });
-      })
+      .then(response => response || fetch(event.request))
   );
 });
