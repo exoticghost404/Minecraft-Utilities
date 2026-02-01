@@ -11,7 +11,7 @@ import { SettingsView } from './components/SettingsView';
 import { CircleGeneratorView } from './components/CircleGeneratorView';
 import { CATEGORIES, BEST_LOADOUTS, POTION_RECIPES } from './constants';
 
-type ViewMode = 'home' | 'checklist' | 'guide' | 'calculator' | 'notes' | 'tools' | 'nether' | 'brewing' | 'settings' | 'circle';
+type ViewMode = 'home' | 'checklist' | 'guide' | 'calcultor' | 'notes' | 'tools' | 'nether' | 'brewing' | 'settings' | 'circle';
 
 const MENU_ITEMS = [
   {
