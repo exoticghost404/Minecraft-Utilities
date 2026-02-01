@@ -116,15 +116,33 @@ const App: React.FC = () => {
   const [view, setView] = useState<ViewMode>('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    // Check if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setIsInstalled(true);
+    }
+
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e);
     };
+
+    const handleAppInstalled = () => {
+      setIsInstalled(true);
+      setDeferredPrompt(null);
+      console.log('PWA was installed');
+    };
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
   }, []);
 
   useEffect(() => {
@@ -146,7 +164,10 @@ const App: React.FC = () => {
     }
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') setDeferredPrompt(null);
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+      setIsInstalled(true);
+    }
   };
 
   if (view === 'checklist') return <ChecklistView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
@@ -204,13 +225,15 @@ const App: React.FC = () => {
 
       {/* TOP UTILITY BAR */}
       <div className="fixed top-6 right-6 z-50 flex items-center gap-3">
-        <button
-          onClick={handleInstallClick}
-          className="p-3 rounded-2xl bg-zinc-900/80 backdrop-blur-xl border border-emerald-500/20 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 hover:border-emerald-500/40 transition-all shadow-[0_0_20px_rgba(16,185,129,0.1)] group active:scale-90"
-          title="Install App"
-        >
-          <Download size={22} className="group-hover:scale-110 transition-transform" />
-        </button>
+        {!isInstalled && (
+          <button
+            onClick={handleInstallClick}
+            className="p-3 rounded-2xl bg-zinc-900/80 backdrop-blur-xl border border-emerald-500/20 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 hover:border-emerald-500/40 transition-all shadow-[0_0_20px_rgba(16,185,129,0.1)] group active:scale-90"
+            title="Install App"
+          >
+            <Download size={22} className="group-hover:scale-110 transition-transform" />
+          </button>
+        )}
         <button
           onClick={() => setView('settings')}
           className="p-3 rounded-2xl bg-zinc-900/80 backdrop-blur-xl border border-zinc-700/50 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all shadow-xl active:scale-90"
@@ -224,7 +247,6 @@ const App: React.FC = () => {
       <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-4xl mt-16 relative z-10">
         <div className="inline-block p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-2xl border border-zinc-800 mb-8 shadow-2xl relative group">
           <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          {/* RESTORED: Sparkles icon instead of e.png */}
           <Sparkles size={56} className="text-emerald-400 relative z-10 animate-pulse" />
         </div>
         
