@@ -1,9 +1,9 @@
 const CACHE_NAME = 'mc-util-v6';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/e.png'
+  './',
+  'index.html',
+  'manifest.json',
+  'e.png'
 ];
 
 // Install: Cache core files immediately
