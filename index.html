@@ -1,18 +1,17 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Minecraft Utility</title>
-    <link rel="manifest" href="/Minecraft-Utilities/manifest.json">
+    <link rel="manifest" href="./assets/manifest-DIu4yPO9.json">
     <meta name="theme-color" content="#09090b">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="MC Util">
     
-    <link rel="icon" type="image/png" href="/Minecraft-Utilities/e.png">
-    <link rel="apple-touch-icon" href="/Minecraft-Utilities/e.png">
+    <!-- FAVICON: Updated to use e.png -->
+    <link rel="icon" type="image/png" href="./assets/e-BayOvkS2.png">
+    
+    <!-- APPLE TOUCH ICON: Updated to use e.png -->
+    <link rel="apple-touch-icon" href="./assets/e-BayOvkS2.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -22,6 +21,7 @@
       ::-webkit-scrollbar-thumb:hover { background: #52525b; }
     </style>
 
+<link rel="stylesheet" href="/index.css">
   <script type="importmap">
 {
   "imports": {
@@ -34,23 +34,20 @@
   }
 }
 </script>
-  <script type="module" crossorigin src="/Minecraft-Utilities/assets/index-DE9anBap.js"></script>
+  <script type="module" crossorigin src="./assets/index-a5dmdQLf.js"></script>
 </head>
   <body class="bg-zinc-950 text-zinc-100">
     <div id="root"></div>
     
+    <!-- Points to your local entry file -->
 
+    <!-- Registers the Offline Service Worker -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          // Explicitly use the absolute path for registration on GitHub Pages subfolders
-          navigator.serviceWorker.register('/Minecraft-Utilities/sw.js', { scope: '/Minecraft-Utilities/' })
-            .then(reg => {
-              console.log('ServiceWorker registration successful with scope: ', reg.scope);
-            })
-            .catch(err => {
-              console.log('ServiceWorker registration failed: ', err);
-            });
+          navigator.serviceWorker.register('/sw.js').catch(err => {
+            console.log('SW registration failed: ', err);
+          });
         });
       }
     </script>
