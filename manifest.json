@@ -3,21 +3,20 @@
   "name": "Minecraft Utility",
   "short_name": "MC Util",
   "description": "All-in-one companion for survival efficiency.",
-  "id": "/Minecraft-Utilities/",
-  "start_url": "/Minecraft-Utilities/",
-  "scope": "/Minecraft-Utilities/",
+  "start_url": ".",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#09090b",
   "theme_color": "#10b981",
   "icons": [
     {
-      "src": "/Minecraft-Utilities/e.png",
+      "src": "e.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/Minecraft-Utilities/e.png",
+      "src": "e.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
