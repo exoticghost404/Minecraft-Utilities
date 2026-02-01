@@ -1,10 +1,12 @@
 
-const CACHE_NAME = 'mc-util-v8';
+const CACHE_NAME = 'mc-util-v9';
+// We use absolute paths from the root of the domain to be safe on GitHub Pages
+const BASE = '/Minecraft-Utilities/';
 const urlsToCache = [
-  './',
-  'index.html',
-  'manifest.json',
-  'e.png'
+  BASE,
+  BASE + 'index.html',
+  BASE + 'manifest.json',
+  BASE + 'e.png'
 ];
 
 self.addEventListener('install', event => {
@@ -12,7 +14,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        // We use a map to catch errors on individual files so one failure doesn't break the whole install
+        console.log('SW: Pre-caching core assets');
         return Promise.allSettled(
           urlsToCache.map(url => cache.add(url))
         );
@@ -32,10 +34,28 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  // Only handle GET requests
   if (event.request.method !== 'GET') return;
-  
+
   event.respondWith(
     caches.match(event.request)
-      .then(response => response || fetch(event.request))
+      .then(response => {
+        if (response) {
+          return response;
+        }
+        return fetch(event.request).then(networkResponse => {
+          // Don't cache external API calls or non-basic responses
+          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+            return networkResponse;
+          }
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseToCache);
+          });
+          return networkResponse;
+        }).catch(() => {
+          // If both fail and it's a navigation request, we could return a fallback but for now just fail
+        });
+      })
   );
 });
