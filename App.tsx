@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Download, Youtube, Twitch, Instagram, FlaskConical, Settings } from 'lucide-react';
 import { ChecklistView } from './components/ChecklistView';
@@ -224,7 +225,6 @@ const App: React.FC = () => {
       <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-4xl mt-16 relative z-10">
         <div className="inline-block p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-2xl border border-zinc-800 mb-8 shadow-2xl relative group">
           <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          {/* RESTORED: Sparkles icon instead of e.png */}
           <Sparkles size={56} className="text-emerald-400 relative z-10 animate-pulse" />
         </div>
         
