@@ -4,14 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Minecraft Utility</title>
+    <!-- Vite copies manifest.json from public/ to the root of dist/ -->
     <link rel="manifest" href="./assets/manifest-DIu4yPO9.json">
     <meta name="theme-color" content="#09090b">
     
-    <!-- FAVICON: Updated to use e.png -->
-    <link rel="icon" type="image/png" href="./assets/e-BayOvkS2.png">
-    
-    <!-- APPLE TOUCH ICON: Updated to use e.png -->
-    <link rel="apple-touch-icon" href="./assets/e-BayOvkS2.png">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/exoticghost404/Minecraft-Utilities/refs/heads/main/e.png">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/exoticghost404/Minecraft-Utilities/refs/heads/main/e.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -38,13 +36,12 @@
   <body class="bg-zinc-950 text-zinc-100">
     <div id="root"></div>
     
-    <!-- Points to your local entry file with relative path -->
 
-    <!-- Registers the Offline Service Worker with relative path -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').catch(err => {
+          // Vite copies sw.js from public/ to the root of dist/
+          navigator.serviceWorker.register('sw.js').catch(err => {
             console.log('SW registration failed: ', err);
           });
         });
