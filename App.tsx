@@ -117,15 +117,30 @@ const App: React.FC = () => {
   const [view, setView] = useState<ViewMode>('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
+      // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
+      // Stash the event so it can be triggered later.
       setDeferredPrompt(e);
+      // Update UI notify the user they can install the PWA
+      setIsInstallable(true);
     };
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    window.addEventListener('appinstalled', () => {
+      setDeferredPrompt(null);
+      setIsInstallable(false);
+      console.log('PWA was installed');
+    });
+
+    return () => {
+        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
   }, []);
 
   useEffect(() => {
@@ -142,12 +157,17 @@ const App: React.FC = () => {
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
-        alert("If you're on mobile, use 'Add to Home Screen' in your browser menu. If on desktop, look for the install icon in the address bar!");
+        alert("To install this app:\n\n• Mobile: Use 'Add to Home Screen' in your browser menu.\n• Desktop: Look for the install icon in the address bar.");
         return;
     }
+    // Show the install prompt
     deferredPrompt.prompt();
+    // Wait for the user to respond to the prompt
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') setDeferredPrompt(null);
+    console.log(`User response to the install prompt: ${outcome}`);
+    // We've used the prompt, and can't use it again, throw it away
+    setDeferredPrompt(null);
+    setIsInstallable(false);
   };
 
   if (view === 'checklist') return <ChecklistView onBack={() => { setView('home'); setSearchQuery(''); }} initialSearch={searchQuery} />;
@@ -207,7 +227,7 @@ const App: React.FC = () => {
       <div className="fixed top-6 right-6 z-50 flex items-center gap-3">
         <button
           onClick={handleInstallClick}
-          className="p-3 rounded-2xl bg-zinc-900/80 backdrop-blur-xl border border-emerald-500/20 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 hover:border-emerald-500/40 transition-all shadow-[0_0_20px_rgba(16,185,129,0.1)] group active:scale-90"
+          className={`p-3 rounded-2xl bg-zinc-900/80 backdrop-blur-xl border border-emerald-500/20 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 hover:border-emerald-500/40 transition-all shadow-[0_0_20px_rgba(16,185,129,0.1)] group active:scale-90 ${isInstallable ? 'ring-2 ring-emerald-500/40 animate-pulse' : ''}`}
           title="Install App"
         >
           <Download size={22} className="group-hover:scale-110 transition-transform" />
