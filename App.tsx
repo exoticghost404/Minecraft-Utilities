@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { BookOpen, CheckSquare, Sparkles, Calculator, Notebook, Globe, Flame, Search, Download, Youtube, Twitch, Instagram, FlaskConical, Settings } from 'lucide-react';
 import { ChecklistView } from './components/ChecklistView';
@@ -142,7 +141,6 @@ const App: React.FC = () => {
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
-        // Fallback for when prompt isn't available (e.g. already installed or not supported)
         alert("If you're on mobile, use 'Add to Home Screen' in your browser menu. If on desktop, look for the install icon in the address bar!");
         return;
     }
@@ -199,9 +197,7 @@ const App: React.FC = () => {
       {/* BACKGROUND DECORATION */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-zinc-950 to-black" />
-         {/* Subtle Grid Pattern */}
          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
-         {/* Decorative Glows */}
          <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-500/10 blur-[100px] rounded-full" />
          <div className="absolute top-1/2 -right-24 w-80 h-80 bg-purple-500/5 blur-[100px] rounded-full" />
       </div>
@@ -228,6 +224,7 @@ const App: React.FC = () => {
       <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 w-full max-w-4xl mt-16 relative z-10">
         <div className="inline-block p-6 rounded-[2rem] bg-zinc-900/50 backdrop-blur-2xl border border-zinc-800 mb-8 shadow-2xl relative group">
           <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          {/* RESTORED: Sparkles icon instead of e.png */}
           <Sparkles size={56} className="text-emerald-400 relative z-10 animate-pulse" />
         </div>
         
