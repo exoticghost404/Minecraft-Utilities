@@ -5,8 +5,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Minecraft Utility</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/Minecraft-Utilities/manifest.json">
     <meta name="theme-color" content="#09090b">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MC Util">
     
     <link rel="icon" type="image/png" href="e.png">
     <link rel="apple-touch-icon" href="e.png">
@@ -39,10 +42,14 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          // Explicitly use relative path for registration
-          navigator.serviceWorker.register('./sw.js', { scope: './' })
-            .then(reg => console.log('SW Registered with scope:', reg.scope))
-            .catch(err => console.log('SW registration failed: ', err));
+          // Use absolute path for service worker to ensure it works on GitHub Pages subfolder
+          navigator.serviceWorker.register('/Minecraft-Utilities/sw.js', { scope: '/Minecraft-Utilities/' })
+            .then(reg => {
+              console.log('ServiceWorker registration successful with scope: ', reg.scope);
+            })
+            .catch(err => {
+              console.log('ServiceWorker registration failed: ', err);
+            });
         });
       }
     </script>
