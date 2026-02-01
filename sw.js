@@ -1,22 +1,20 @@
 
-const CACHE_NAME = 'mc-util-v12';
-const BASE = '/Minecraft-Utilities/';
-
+const CACHE_NAME = 'mc-util-v13';
 const urlsToCache = [
-  BASE,
-  BASE + 'index.html',
-  BASE + 'manifest.json',
-  BASE + 'e.png'
+  './',
+  'index.html',
+  'manifest.json',
+  'e.png'
 ];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      console.log('SW: Pre-caching assets from', BASE);
-      return cache.addAll(urlsToCache).catch(err => {
-        console.error('SW: Cache addAll failed. Check if paths are correct:', err);
-      });
+      console.log('SW: Pre-caching core assets');
+      return Promise.allSettled(
+        urlsToCache.map(url => cache.add(url))
+      );
     })
   );
 });
@@ -47,7 +45,7 @@ self.addEventListener('fetch', event => {
         });
         return networkResponse;
       }).catch(() => {
-        // Silent fail for offline
+        // Network failed, possibly offline
       });
     })
   );
