@@ -286,9 +286,10 @@ const App: React.FC = () => {
                             <button
                             key={item.id}
                             onClick={() => setView(item.view as ViewMode)}
-                            className={`group relative p-8 rounded-[2rem] bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/80 ${item.theme.hoverBorder} hover:bg-zinc-900/60 transition-all duration-500 text-left flex flex-col h-full ${item.theme.hoverShadow} overflow-hidden hover:-translate-y-2 active:scale-[0.98]`}
+                            style={{ transform: 'translateZ(0)' }}
+                            className={`group relative p-8 rounded-[2rem] bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 ${item.theme.hoverBorder} hover:bg-zinc-900/80 transition-all duration-500 text-left flex flex-col h-full ${item.theme.hoverShadow} overflow-hidden hover:-translate-y-2 active:scale-[0.98] isolate bg-clip-padding`}
                             >
-                            <div className={`absolute inset-0 bg-gradient-to-br ${item.theme.gradient} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                            <div className={`absolute inset-0 bg-gradient-to-br ${item.theme.gradient} via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
                             
                             <div className="relative z-10 flex items-start justify-between mb-10">
                                 <div className={`p-4 ${item.theme.iconBg} rounded-2xl border ${item.theme.iconBorder} group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl`}>
