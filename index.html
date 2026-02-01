@@ -1,16 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Minecraft Utility</title>
-    <link rel="manifest" href="/manifest.json">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#09090b">
     
-    <!-- FAVICON: Updated to use e.png -->
     <link rel="icon" type="image/png" href="e.png">
-    
-    <!-- APPLE TOUCH ICON: Updated to use e.png -->
     <link rel="apple-touch-icon" href="e.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -32,19 +30,17 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
   <body class="bg-zinc-950 text-zinc-100">
     <div id="root"></div>
     
-    <!-- Points to your local entry file -->
-    <script type="module" src="/index.tsx"></script>
+    <script type="module" src="index.tsx"></script>
 
-    <!-- Registers the Offline Service Worker -->
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(err => {
+          // Use relative path for registration
+          navigator.serviceWorker.register('sw.js').catch(err => {
             console.log('SW registration failed: ', err);
           });
         });
