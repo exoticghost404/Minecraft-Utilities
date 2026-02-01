@@ -26,8 +26,7 @@
     "react/": "https://aistudiocdn.com/react@^19.2.1/",
     "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
     "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1",
-    "vite": "https://aistudiocdn.com/vite@^7.2.6",
-    "@google/genai": "https://esm.sh/@google/genai@^1.39.0"
+    "vite": "https://aistudiocdn.com/vite@^7.2.6"
   }
 }
 </script>
@@ -40,10 +39,10 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          // Use relative path for registration to support subfolder hosting
-          navigator.serviceWorker.register('sw.js').catch(err => {
-            console.log('SW registration failed: ', err);
-          });
+          // Explicitly use relative path for registration
+          navigator.serviceWorker.register('./sw.js', { scope: './' })
+            .then(reg => console.log('SW Registered with scope:', reg.scope))
+            .catch(err => console.log('SW registration failed: ', err));
         });
       }
     </script>
