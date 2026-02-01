@@ -1,17 +1,18 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Minecraft Utility</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/Minecraft-Utilities/manifest.json">
     <meta name="theme-color" content="#09090b">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MC Util">
     
-    <link rel="icon" type="image/png" href="e.png">
-    <link rel="apple-touch-icon" href="e.png">
+    <link rel="icon" type="image/png" href="/Minecraft-Utilities/e.png">
+    <link rel="apple-touch-icon" href="/Minecraft-Utilities/e.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -41,8 +42,8 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          // Relative path is more reliable for subfolder hosting
-          navigator.serviceWorker.register('sw.js')
+          // Absolute path is required for stable subfolder deployment on GH Pages
+          navigator.serviceWorker.register('/Minecraft-Utilities/sw.js', { scope: '/Minecraft-Utilities/' })
             .then(reg => {
               console.log('ServiceWorker registration successful with scope: ', reg.scope);
             })
