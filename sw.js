@@ -1,8 +1,9 @@
-const CACHE_NAME = 'mc-util-v5';
+const CACHE_NAME = 'mc-util-v6';
 const urlsToCache = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/e.png'
 ];
 
 // Install: Cache core files immediately
@@ -38,21 +39,17 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Return cached response if found
         if (response) {
           return response;
         }
 
-        // Otherwise network request
         return fetch(event.request).then(
           function(response) {
-            // Check if valid response
             if(!response || response.status !== 200 || (response.type !== 'basic' && response.type !== 'cors')) {
               return response;
             }
 
             var responseToCache = response.clone();
-
             caches.open(CACHE_NAME)
               .then(function(cache) {
                 cache.put(event.request, responseToCache);
