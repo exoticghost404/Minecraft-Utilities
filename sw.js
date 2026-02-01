@@ -1,12 +1,12 @@
-const CACHE_NAME = 'mc-util-v6';
+const CACHE_NAME = 'mc-util-v7';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/e.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './e.png'
 ];
 
-// Install: Cache core files immediately
+// Install: Cache core files using relative paths
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
@@ -32,7 +32,7 @@ self.addEventListener('activate', event => {
   return self.clients.claim();
 });
 
-// Fetch: Cache First strategy with network fallback/update
+// Fetch: Cache First strategy with network fallback
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
 
