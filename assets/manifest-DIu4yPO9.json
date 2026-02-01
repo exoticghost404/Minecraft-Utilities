@@ -8,13 +8,13 @@
   "theme_color": "#10b981",
   "icons": [
     {
-      "src": "https://raw.githubusercontent.com/exoticghost404/Minecraft-Utilities/refs/heads/main/wallpaper_minecraft_pc_bundle_1920x1080.png",
+      "src": "https://raw.githubusercontent.com/exoticghost404/Minecraft-Utilities/refs/heads/main/e.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://raw.githubusercontent.com/exoticghost404/Minecraft-Utilities/refs/heads/main/wallpaper_minecraft_pc_bundle_1920x1080.png",
+      "src": "https://raw.githubusercontent.com/exoticghost404/Minecraft-Utilities/refs/heads/main/e.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
