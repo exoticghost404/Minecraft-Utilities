@@ -1,24 +1,20 @@
-
-const CACHE_NAME = 'mc-util-v9';
-// We use absolute paths from the root of the domain to be safe on GitHub Pages
-const BASE = '/Minecraft-Utilities/';
+const CACHE_NAME = 'mc-util-v11';
 const urlsToCache = [
-  BASE,
-  BASE + 'index.html',
-  BASE + 'manifest.json',
-  BASE + 'e.png'
+  './',
+  'index.html',
+  'manifest.json',
+  'e.png'
 ];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('SW: Pre-caching core assets');
-        return Promise.allSettled(
-          urlsToCache.map(url => cache.add(url))
-        );
-      })
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('SW: Pre-caching assets');
+      return cache.addAll(urlsToCache).catch(err => {
+        console.error('SW: Cache addAll failed', err);
+      });
+    })
   );
 });
 
@@ -34,28 +30,22 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request).then(networkResponse => {
-          // Don't cache external API calls or non-basic responses
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-            return networkResponse;
-          }
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseToCache);
-          });
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request).then(networkResponse => {
+        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
           return networkResponse;
-        }).catch(() => {
-          // If both fail and it's a navigation request, we could return a fallback but for now just fail
+        }
+        const responseToCache = networkResponse.clone();
+        caches.open(CACHE_NAME).then(cache => {
+          cache.put(event.request, responseToCache);
         });
-      })
+        return networkResponse;
+      }).catch(() => {
+        // Fallback for offline if needed
+      });
+    })
   );
 });
