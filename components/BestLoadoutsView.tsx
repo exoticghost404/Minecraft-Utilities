@@ -9,7 +9,7 @@ interface BestLoadoutsViewProps {
   initialSearch?: string;
 }
 
-export const BestLoadoutsView: React.FC<BestLoadoutsViewProps> = ({ onBack, initialSearch = '' }) => {
+export const BestLoadoutsView: Reat.FC<BestLoadoutsViewProps> = ({ onBack, initialSearch = '' }) => {
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [gearChecked, setGearChecked] = useState<Record<string, boolean>>({});
   const [isLoaded, setIsLoaded] = useState(false);
