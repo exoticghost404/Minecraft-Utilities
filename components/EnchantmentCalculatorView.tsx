@@ -20,76 +20,76 @@ const ITEM_TYPES = [
  * Based on https://minecraft.wiki/w/Anvil_mechanics#Enchantment_multiplier
  */
 interface EnchantData {
-    levelMax: number;
-    weight: number; // Multplier when sacrifice is a Book
-    incompatible: string[];
-    items: string[];
+  levelMax: number;
+  weight: number; // Multplier when sacrifice is a Book
+  incompatible: string[];
+  items: string[];
 }
 
 const ENCHANTMENT_DATA: Record<string, EnchantData> = {
-    // Armor
-    protection: { levelMax: 4, weight: 1, incompatible: ["blast_protection", "fire_protection", "projectile_protection"], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
-    fire_protection: { levelMax: 4, weight: 1, incompatible: ["blast_protection", "protection", "projectile_protection"], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
-    feather_falling: { levelMax: 4, weight: 1, incompatible: [], items: ["boots"] },
-    blast_protection: { levelMax: 4, weight: 2, incompatible: ["fire_protection", "protection", "projectile_protection"], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
-    projectile_protection: { levelMax: 4, weight: 1, incompatible: ["protection", "blast_protection", "fire_protection"], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
-    respiration: { levelMax: 3, weight: 2, incompatible: [], items: ["helmet", "turtle_shell"] },
-    aqua_affinity: { levelMax: 1, weight: 2, incompatible: [], items: ["helmet", "turtle_shell"] },
-    thorns: { levelMax: 3, weight: 4, incompatible: [], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
-    depth_strider: { levelMax: 3, weight: 2, incompatible: ["frost_walker"], items: ["boots"] },
-    frost_walker: { levelMax: 2, weight: 2, incompatible: ["depth_strider"], items: ["boots"] },
-    soul_speed: { levelMax: 3, weight: 4, incompatible: [], items: ["boots"] },
-    swift_sneak: { levelMax: 3, weight: 4, incompatible: [], items: ["leggings"] },
+  // Armor
+  protection: { levelMax: 4, weight: 1, incompatible: ["blast_protection", "fire_protection", "projectile_protection"], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
+  fire_protection: { levelMax: 4, weight: 1, incompatible: ["blast_protection", "protection", "projectile_protection"], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
+  feather_falling: { levelMax: 4, weight: 1, incompatible: [], items: ["boots"] },
+  blast_protection: { levelMax: 4, weight: 2, incompatible: ["fire_protection", "protection", "projectile_protection"], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
+  projectile_protection: { levelMax: 4, weight: 1, incompatible: ["protection", "blast_protection", "fire_protection"], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
+  respiration: { levelMax: 3, weight: 2, incompatible: [], items: ["helmet", "turtle_shell"] },
+  aqua_affinity: { levelMax: 1, weight: 2, incompatible: [], items: ["helmet", "turtle_shell"] },
+  thorns: { levelMax: 3, weight: 4, incompatible: [], items: ["helmet", "chestplate", "leggings", "boots", "turtle_shell"] },
+  depth_strider: { levelMax: 3, weight: 2, incompatible: ["frost_walker"], items: ["boots"] },
+  frost_walker: { levelMax: 2, weight: 2, incompatible: ["depth_strider"], items: ["boots"] },
+  soul_speed: { levelMax: 3, weight: 4, incompatible: [], items: ["boots"] },
+  swift_sneak: { levelMax: 3, weight: 4, incompatible: [], items: ["leggings"] },
 
-    // Weapons
-    sharpness: { levelMax: 5, weight: 1, incompatible: ["bane_of_arthropods", "smite", "density", "breach"], items: ["sword", "axe", "spear"] },
-    smite: { levelMax: 5, weight: 1, incompatible: ["bane_of_arthropods", "sharpness", "density", "breach"], items: ["sword", "axe", "mace", "spear"] },
-    bane_of_arthropods: { levelMax: 5, weight: 1, incompatible: ["smite", "sharpness", "density", "breach"], items: ["sword", "axe", "mace", "spear"] },
-    knockback: { levelMax: 2, weight: 1, incompatible: [], items: ["sword", "spear"] },
-    fire_aspect: { levelMax: 2, weight: 2, incompatible: [], items: ["sword", "mace", "spear"] },
-    looting: { levelMax: 3, weight: 2, incompatible: [], items: ["sword", "spear"] },
-    sweeping_edge: { levelMax: 3, weight: 2, incompatible: [], items: ["sword"] },
-    
-    // Ranged
-    power: { levelMax: 5, weight: 1, incompatible: [], items: ["bow"] },
-    punch: { levelMax: 2, weight: 2, incompatible: [], items: ["bow"] },
-    flame: { levelMax: 1, weight: 2, incompatible: [], items: ["bow"] },
-    infinity: { levelMax: 1, weight: 4, incompatible: ["mending"], items: ["bow"] },
-    luck_of_the_sea: { levelMax: 3, weight: 2, incompatible: [], items: ["fishing_rod"] },
-    lure: { levelMax: 3, weight: 2, incompatible: [], items: ["fishing_rod"] },
-    loyalty: { levelMax: 3, weight: 1, incompatible: ["riptide"], items: ["trident"] },
-    impaling: { levelMax: 5, weight: 2, incompatible: [], items: ["trident"] },
-    riptide: { levelMax: 3, weight: 2, incompatible: ["channeling", "loyalty"], items: ["trident"] },
-    channeling: { levelMax: 1, weight: 4, incompatible: ["riptide"], items: ["trident"] },
-    multishot: { levelMax: 1, weight: 2, incompatible: ["piercing"], items: ["crossbow"] },
-    piercing: { levelMax: 4, weight: 1, incompatible: ["multishot"], items: ["crossbow"] },
-    quick_charge: { levelMax: 3, weight: 1, incompatible: [], items: ["crossbow"] },
+  // Weapons
+  sharpness: { levelMax: 5, weight: 1, incompatible: ["bane_of_arthropods", "smite", "density", "breach"], items: ["sword", "axe", "spear"] },
+  smite: { levelMax: 5, weight: 1, incompatible: ["bane_of_arthropods", "sharpness", "density", "breach"], items: ["sword", "axe", "mace", "spear"] },
+  bane_of_arthropods: { levelMax: 5, weight: 1, incompatible: ["smite", "sharpness", "density", "breach"], items: ["sword", "axe", "mace", "spear"] },
+  knockback: { levelMax: 2, weight: 1, incompatible: [], items: ["sword", "spear"] },
+  fire_aspect: { levelMax: 2, weight: 2, incompatible: [], items: ["sword", "mace", "spear"] },
+  looting: { levelMax: 3, weight: 2, incompatible: [], items: ["sword", "spear"] },
+  sweeping_edge: { levelMax: 3, weight: 2, incompatible: [], items: ["sword"] },
+   
+  // Ranged
+  power: { levelMax: 5, weight: 1, incompatible: [], items: ["bow"] },
+  punch: { levelMax: 2, weight: 2, incompatible: [], items: ["bow"] },
+  flame: { levelMax: 1, weight: 2, incompatible: [], items: ["bow"] },
+  infinity: { levelMax: 1, weight: 4, incompatible: ["mending"], items: ["bow"] },
+  luck_of_the_sea: { levelMax: 3, weight: 2, incompatible: [], items: ["fishing_rod"] },
+  lure: { levelMax: 3, weight: 2, incompatible: [], items: ["fishing_rod"] },
+  loyalty: { levelMax: 3, weight: 1, incompatible: ["riptide"], items: ["trident"] },
+  impaling: { levelMax: 5, weight: 2, incompatible: [], items: ["trident"] },
+  riptide: { levelMax: 3, weight: 2, incompatible: ["channeling", "loyalty"], items: ["trident"] },
+  channeling: { levelMax: 1, weight: 4, incompatible: ["riptide"], items: ["trident"] },
+  multishot: { levelMax: 1, weight: 2, incompatible: ["piercing"], items: ["crossbow"] },
+  piercing: { levelMax: 4, weight: 1, incompatible: ["multishot"], items: ["crossbow"] },
+  quick_charge: { levelMax: 3, weight: 1, incompatible: [], items: ["crossbow"] },
 
-    // Tools
-    efficiency: { levelMax: 5, weight: 1, incompatible: [], items: ["pickaxe", "shovel", "axe", "hoe", "shears"] },
-    silk_touch: { levelMax: 1, weight: 4, incompatible: ["fortune"], items: ["pickaxe", "shovel", "axe", "hoe", "shears"] },
-    fortune: { levelMax: 3, weight: 2, incompatible: ["silk_touch"], items: ["pickaxe", "shovel", "axe", "hoe"] },
+  // Tools
+  efficiency: { levelMax: 5, weight: 1, incompatible: [], items: ["pickaxe", "shovel", "axe", "hoe", "shears"] },
+  silk_touch: { levelMax: 1, weight: 4, incompatible: ["fortune"], items: ["pickaxe", "shovel", "axe", "hoe", "shears"] },
+  fortune: { levelMax: 3, weight: 2, incompatible: ["silk_touch"], items: ["pickaxe", "shovel", "axe", "hoe"] },
 
-    // Universal
-    unbreaking: { levelMax: 3, weight: 1, incompatible: [], items: ["helmet", "chestplate", "leggings", "boots", "pickaxe", "shovel", "axe", "sword", "hoe", "brush", "fishing_rod", "bow", "shears", "flint_and_steel", "carrot_on_a_stick", "warped_fungus_on_a_stick", "shield", "elytra", "trident", "turtle_shell", "crossbow", "mace", "spear"] },
-    mending: { levelMax: 1, weight: 2, incompatible: ["infinity"], items: ["helmet", "chestplate", "leggings", "boots", "pickaxe", "shovel", "axe", "sword", "hoe", "brush", "fishing_rod", "bow", "shears", "flint_and_steel", "carrot_on_a_stick", "warped_fungus_on_a_stick", "shield", "elytra", "trident", "turtle_shell", "crossbow", "mace", "spear"] },
-    curse_of_binding: { levelMax: 1, weight: 4, incompatible: [], items: ["helmet", "chestplate", "leggings", "boots", "elytra", "pumpkin", "turtle_shell"] },
-    curse_of_vanishing: { levelMax: 1, weight: 4, incompatible: [], items: ["helmet", "chestplate", "leggings", "boots", "pickaxe", "shovel", "axe", "sword", "hoe", "brush", "fishing_rod", "bow", "shears", "flint_and_steel", "carrot_on_a_stick", "warped_fungus_on_a_stick", "shield", "elytra", "pumpkin", "trident", "turtle_shell", "crossbow", "mace", "spear"] },
+  // Universal
+  unbreaking: { levelMax: 3, weight: 1, incompatible: [], items: ["helmet", "chestplate", "leggings", "boots", "pickaxe", "shovel", "axe", "sword", "hoe", "brush", "fishing_rod", "bow", "shears", "flint_and_steel", "carrot_on_a_stick", "warped_fungus_on_a_stick", "shield", "elytra", "trident", "turtle_shell", "crossbow", "mace", "spear"] },
+  mending: { levelMax: 1, weight: 2, incompatible: ["infinity"], items: ["helmet", "chestplate", "leggings", "boots", "pickaxe", "shovel", "axe", "sword", "hoe", "brush", "fishing_rod", "bow", "shears", "flint_and_steel", "carrot_on_a_stick", "warped_fungus_on_a_stick", "shield", "elytra", "trident", "turtle_shell", "crossbow", "mace", "spear"] },
+  curse_of_binding: { levelMax: 1, weight: 4, incompatible: [], items: ["helmet", "chestplate", "leggings", "boots", "elytra", "pumpkin", "turtle_shell"] },
+  curse_of_vanishing: { levelMax: 1, weight: 4, incompatible: [], items: ["helmet", "chestplate", "leggings", "boots", "pickaxe", "shovel", "axe", "sword", "hoe", "brush", "fishing_rod", "bow", "shears", "flint_and_steel", "carrot_on_a_stick", "warped_fungus_on_a_stick", "shield", "elytra", "pumpkin", "trident", "turtle_shell", "crossbow", "mace", "spear"] },
 
-    // 1.21 Mace & Spear
-    density: { levelMax: 5, weight: 1, incompatible: ["breach", "smite", "bane_of_arthropods", "sharpness"], items: ["mace"] },
-    breach: { levelMax: 4, weight: 2, incompatible: ["density", "smite", "bane_of_arthropods", "sharpness"], items: ["mace"] },
-    wind_burst: { levelMax: 3, weight: 2, incompatible: [], items: ["mace"] },
-    lunge: { levelMax: 3, weight: 1, incompatible: [], items: ["spear"] }
+  // 1.21 Mace & Spear
+  density: { levelMax: 5, weight: 1, incompatible: ["breach", "smite", "bane_of_arthropods", "sharpness"], items: ["mace"] },
+  breach: { levelMax: 4, weight: 2, incompatible: ["density", "smite", "bane_of_arthropods", "sharpness"], items: ["mace"] },
+  wind_burst: { levelMax: 3, weight: 2, incompatible: [], items: ["mace"] },
+  lunge: { levelMax: 3, weight: 1, incompatible: [], items: ["spear"] }
 };
 
 const normalizeItemType = (type: string): string => {
-    const t = type.toLowerCase();
-    if (t.includes('turtle')) return 'turtle_shell';
-    if (t.includes('carrot')) return 'carrot_on_a_stick';
-    if (t.includes('flint')) return 'flint_and_steel';
-    if (t.includes('fishing')) return 'fishing_rod';
-    return t.replace(/\s+/g, '_').replace(/[\/]/g, '_');
+  const t = type.toLowerCase();
+  if (t.includes('turtle')) return 'turtle_shell';
+  if (t.includes('carrot')) return 'carrot_on_a_stick';
+  if (t.includes('flint')) return 'flint_and_steel';
+  if (t.includes('fishing')) return 'fishing_rod';
+  return t.replace(/\s+/g, '_').replace(/[\/]/g, '_');
 };
 
 const getMaxLevelNumber = (maxLevelRange?: string) => {
@@ -101,8 +101,8 @@ const getMaxLevelNumber = (maxLevelRange?: string) => {
 };
 
 const getDisplayLevel = (level: number) => {
-    const map: Record<number, string> = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' };
-    return map[level] || `${level}`;
+  const map: Record<number, string> = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' };
+  return map[level] || `${level}`;
 };
 
 const getPrettyName = (id: string) => {
@@ -115,344 +115,318 @@ const getPrettyName = (id: string) => {
   return id.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 };
 
-// --- ALGORITHM IMPLEMENTATION ---
+// --- ALGORITHM IMPLEMENTATION (OPTIMIZED BITMASK DP) ---
 
 let ID_LIST: Record<string, number> = {};
 let ENCHANTMENT2WEIGHT: number[] = [];
-let RESULTS_CACHE: Map<string, Record<number, item_obj>> = new Map();
 
+// Initialize static data
 const initializeSolverData = () => {
-    ID_LIST = {};
-    ENCHANTMENT2WEIGHT = [];
-    let id = 0;
-    for (const key in ENCHANTMENT_DATA) {
-        ID_LIST[key] = id;
-        ENCHANTMENT2WEIGHT[id] = ENCHANTMENT_DATA[key].weight;
-        id++;
-    }
+  ID_LIST = {};
+  ENCHANTMENT2WEIGHT = [];
+  let id = 0;
+  for (const key in ENCHANTMENT_DATA) {
+    ID_LIST[key] = id;
+    ENCHANTMENT2WEIGHT[id] = ENCHANTMENT_DATA[key].weight;
+    id++;
+  }
 };
 initializeSolverData();
 
 const MAXIMUM_MERGE_LEVELS = 39;
 
 class MergeLevelsTooExpensiveError extends Error {
-    constructor(message = 'merge levels is above maximum allowed') {
-        super(message);
-        this.name = 'MergeLevelsTooExpensiveError';
-    }
+  constructor(message = 'merge levels is above maximum allowed') {
+    super(message);
+    this.name = 'MergeLevelsTooExpensiveError';
+  }
 }
 
 const experience = (level: number) => {
-    if (level === 0) return 0;
-    if (level <= 16) return level * level + 6 * level;
-    if (level <= 31) return 2.5 * level * level - 40.5 * level + 360;
-    return 4.5 * level * level - 162.5 * level + 2220;
+  if (level === 0) return 0;
+  if (level <= 16) return level * level + 6 * level;
+  if (level <= 31) return 2.5 * level * level - 40.5 * level + 360;
+  return 4.5 * level * level - 162.5 * level + 2220;
 };
 
 class item_obj {
-    i: string | number;
-    e: number[];
-    c: any;
-    w: number; // Work Value (Prior Penalty Uses)
-    l: number; // Accumulated Enchantment Level Value (Level Cost)
-    x: number; // Total Raw XP
-    display: string;
+  i: string | number;
+  e: number[]; // Array of Enchantment IDs
+  c: any;      // Composition/History for reconstruction
+  w: number;   // Work Value (Prior Penalty Uses)
+  l: number;   // Accumulated Enchantment Cost
+  x: number;   // Total XP Cost
+  display: string;
 
-    constructor(name: string | number, value: number = 0, id: number[] = [], display: string = '') {
-        this.i = name;
-        this.e = id;
-        this.c = {};
-        this.w = 0;
-        this.l = value;
-        this.x = 0;
-        this.display = display;
-    }
+  constructor(name: string | number, value: number = 0, id: number[] = [], display: string = '') {
+    this.i = name;
+    this.e = id;
+    this.c = {};
+    this.w = 0;
+    this.l = value;
+    this.x = 0;
+    this.display = display;
+  }
 }
 
 const stripBookWrapper = (name: string): string => {
-    if (name.startsWith('Book (') && name.endsWith(')')) {
-        return name.slice(6, -1);
-    }
-    return name;
+  if (name.startsWith('Book (') && name.endsWith(')')) {
+    return name.slice(6, -1);
+  }
+  return name;
 };
 
 class MergeEnchants extends item_obj {
-    constructor(left: item_obj, right: item_obj) {
-        const penaltyA = Math.pow(2, left.w) - 1;
-        const penaltyB = Math.pow(2, right.w) - 1;
-        const enchant_cost = right.l; 
-        
-        const merge_cost = penaltyA + penaltyB + enchant_cost;
-        
-        if (merge_cost > MAXIMUM_MERGE_LEVELS) {
-            throw new MergeLevelsTooExpensiveError();
-        }
-        
-        const new_value = left.l + right.l;
-        let display = "Book";
-        const rightContent = stripBookWrapper(right.display);
-        
-        if (left.i === 'item') {
-            if (left.display.includes('(') && left.display.endsWith(')')) {
-                display = left.display.slice(0, -1) + `, ${rightContent})`;
-            } else {
-                display = `${left.display} (${rightContent})`;
-            }
-        } else {
-            const leftContent = stripBookWrapper(left.display);
-            display = `Book (${leftContent}, ${rightContent})`;
-        }
-
-        super(left.i, new_value, left.e.concat(right.e), display);
-        this.w = Math.max(left.w, right.w) + 1;
-        this.x = left.x + right.x + experience(merge_cost);
-        this.c = { 
-            L: left.c, 
-            R: right.c, 
-            l: merge_cost, 
-            w: this.w, 
-            v: this.l,
-            leftDisplay: left.display,
-            rightDisplay: right.display
-        };
+  constructor(left: item_obj, right: item_obj) {
+    const penaltyA = Math.pow(2, left.w) - 1;
+    const penaltyB = Math.pow(2, right.w) - 1;
+    const enchant_cost = right.l; 
+    
+    const merge_cost = penaltyA + penaltyB + enchant_cost;
+    
+    if (merge_cost > MAXIMUM_MERGE_LEVELS) {
+      throw new MergeLevelsTooExpensiveError();
     }
-}
-
-function combinations<T>(set: T[], k: number): T[][] {
-    if (k > set.length || k <= 0) return [];
-    if (k === set.length) return [set];
-    if (k === 1) return set.map(x => [x]);
-    const combs: T[][] = [];
-    for (let i = 0; i < set.length - k + 1; i++) {
-        const head = set.slice(i, i + 1);
-        const tailcombs = combinations(set.slice(i + 1), k - 1);
-        for (let j = 0; j < tailcombs.length; j++) {
-            combs.push(head.concat(tailcombs[j]));
-        }
-    }
-    return combs;
-}
-
-function hashFromItem(item: item_obj): string {
-    const enchants = [...item.e].sort((a,b) => a-b);
-    return `${item.i}|${enchants.join(',')}|${item.w}`;
-}
-
-function memoizeHashFromArguments(items: item_obj[]) {
-    return items.map(hashFromItem).join(';');
-}
-
-function compareCheapest(item1: item_obj, item2: item_obj): Record<number, item_obj> {
-    const work2item: Record<number, item_obj> = {};
-    const work1 = item1.w;
-    const work2 = item2.w;
-    if (work1 === work2) {
-        const val1 = item1.l;
-        const val2 = item2.l;
-        if (val1 === val2) {
-            if (item1.x <= item2.x) work2item[work1] = item1;
-            else work2item[work2] = item2;
-        } else if (val1 < val2) {
-            work2item[work1] = item1;
-        } else {
-            work2item[work2] = item2;
-        }
+    
+    const new_value = left.l + right.l;
+    let display = "Book";
+    const rightContent = stripBookWrapper(right.display);
+    
+    if (left.i === 'item') {
+      if (left.display.includes('(') && left.display.endsWith(')')) {
+        display = left.display.slice(0, -1) + `, ${rightContent})`;
+      } else {
+        display = `${left.display} (${rightContent})`;
+      }
     } else {
-        work2item[work1] = item1;
-        work2item[work2] = item2;
+      const leftContent = stripBookWrapper(left.display);
+      display = `Book (${leftContent}, ${rightContent})`;
     }
-    return work2item;
+
+    // Call parent constructor
+    super(left.i, new_value, left.e.concat(right.e), display);
+    
+    this.w = Math.max(left.w, right.w) + 1;
+    this.x = left.x + right.x + experience(merge_cost);
+    this.c = { 
+      L: left.c, 
+      R: right.c, 
+      l: merge_cost, 
+      w: this.w, 
+      v: this.l,
+      leftDisplay: left.display,
+      rightDisplay: right.display
+    };
+  }
 }
 
-function removeExpensiveCandidatesFromDictionary(work2item: Record<number, item_obj>) {
-    const cheapest: Record<number, item_obj> = {};
-    let cheapest_value: number | undefined;
-    const works = Object.keys(work2item).map(Number).sort((a, b) => a - b);
-    for (const work of works) {
-        const item = work2item[work];
-        const value = item.l;
-        if (cheapest_value === undefined || value < cheapest_value) {
-            cheapest[work] = item;
-            cheapest_value = value;
-        }
-    }
-    return cheapest;
+// Count set bits in an integer (Hamming Weight)
+function countSetBits(n: number): number {
+  let count = 0;
+  while (n > 0) {
+    n &= (n - 1);
+    count++;
+  }
+  return count;
 }
 
-function cheapestItemFromItems2(left: item_obj, right: item_obj): item_obj {
-    if (right.i === 'item') return new MergeEnchants(right, left);
-    if (left.i === 'item') return new MergeEnchants(left, right);
-    let normal: MergeEnchants | null = null;
-    try { normal = new MergeEnchants(left, right); } catch {}
-    let reversed: MergeEnchants | null = null;
-    try { reversed = new MergeEnchants(right, left); } catch {}
-    if (!normal && !reversed) throw new MergeLevelsTooExpensiveError();
-    if (normal && !reversed) return normal;
-    if (!normal && reversed) return reversed;
-    const best = compareCheapest(normal!, reversed!);
-    return Object.values(best)[0];
-}
+// Compare two items and return the 'better' one based on Anvil mechanics
+// Returns true if item1 is better than or equal to item2
+function isBetterOrEqual(item1: item_obj, item2: item_obj): boolean {
+  // If work penalty is lower, it's generally better
+  if (item1.w < item2.w) return true;
+  if (item1.w > item2.w) return false;
+  
+  // If work penalty is same, check XP cost
+  if (item1.x < item2.x) return true;
+  if (item1.x > item2.x) return false;
 
-function cheapestItemsFromList(items: item_obj[]): Record<number, item_obj> {
-    const argsKey = memoizeHashFromArguments(items);
-    if (RESULTS_CACHE.has(argsKey)) return RESULTS_CACHE.get(argsKey)!;
-    let work2item: Record<number, item_obj> = {};
-    const count = items.length;
-    if (count === 1) {
-        const item = items[0];
-        work2item[item.w] = item;
-        RESULTS_CACHE.set(argsKey, work2item);
-        return work2item;
-    }
-    if (count === 2) {
-        try {
-            const cheapest = cheapestItemFromItems2(items[0], items[1]);
-            work2item[cheapest.w] = cheapest;
-        } catch {}
-        RESULTS_CACHE.set(argsKey, work2item);
-        return work2item;
-    }
-    const max_subcount = Math.floor(count / 2);
-    for (let k = 1; k <= max_subcount; k++) {
-        const subcombs = combinations(items, k);
-        for (const left_subset of subcombs) {
-            const right_subset = items.filter(x => !left_subset.includes(x));
-            const left_res = cheapestItemsFromList(left_subset);
-            const right_res = cheapestItemsFromList(right_subset);
-            for (const lw in left_res) {
-                const l_item = left_res[lw];
-                for (const rw in right_res) {
-                    const r_item = right_res[rw];
-                    let new_map: Record<number, item_obj> = {};
-                    try {
-                        const merged = cheapestItemFromItems2(l_item, r_item);
-                        new_map[merged.w] = merged;
-                    } catch { continue; }
-                    for (const w in new_map) {
-                        const new_item = new_map[w];
-                        const workNum = Number(w);
-                        if (work2item[workNum]) {
-                            const better = compareCheapest(work2item[workNum], new_item);
-                            work2item[workNum] = better[workNum];
-                        } else {
-                            work2item[workNum] = new_item;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    work2item = removeExpensiveCandidatesFromDictionary(work2item);
-    RESULTS_CACHE.set(argsKey, work2item);
-    return work2item;
+  // If XP is same, check Level cost
+  return item1.l <= item2.l;
 }
 
 function getInstructions(comb: any): any[] {
-    let instructions: any[] = [];
-    if (comb.L || comb.R) {
-        if (comb.L && comb.L.l !== undefined) instructions = instructions.concat(getInstructions(comb.L));
-        if (comb.R && comb.R.l !== undefined) instructions = instructions.concat(getInstructions(comb.R));
-        const cost = comb.l;
-        const xp = experience(cost);
-        const work = Math.max(comb.L.w, comb.R.w) + 1;
-        const priorPenalty = Math.pow(2, work) - 1;
-        instructions.push({ 
-          left: comb.leftDisplay, 
-          right: comb.rightDisplay, 
-          cost: cost, 
-          xp: xp, 
-          priorWork: priorPenalty 
-        });
-    }
-    return instructions;
+  let instructions: any[] = [];
+  if (comb.L || comb.R) {
+    if (comb.L && comb.L.l !== undefined) instructions = instructions.concat(getInstructions(comb.L));
+    if (comb.R && comb.R.l !== undefined) instructions = instructions.concat(getInstructions(comb.R));
+    const cost = comb.l;
+    const xp = experience(cost);
+    const work = Math.max(comb.L.w, comb.R.w) + 1;
+    const priorPenalty = Math.pow(2, work) - 1;
+    instructions.push({ 
+      left: comb.leftDisplay, 
+      right: comb.rightDisplay, 
+      cost: cost, 
+      xp: xp, 
+      priorWork: priorPenalty 
+    });
+  }
+  return instructions;
 }
 
+/**
+ * Main Solver Logic
+ * Uses Bottom-Up DP with Bitmasks
+ */
 function processCalculation(itemType: string, enchants: [string, number][], mode: 'levels' | 'prior_work') {
-    RESULTS_CACHE.clear();
-    const enchant_objs: item_obj[] = [];
-    enchants.forEach(([name, level]) => {
-        const id = ID_LIST[name];
-        const weight = ENCHANTMENT2WEIGHT[id];
-        const val = level * weight;
-        const display = `Book (${getPrettyName(name)} ${getDisplayLevel(level)})`;
-        const obj = new item_obj('book', val, [id], display);
-        obj.c = { I: id, l: obj.l, w: obj.w };
-        enchant_objs.push(obj);
-    });
-    if (enchant_objs.length === 0) return null;
-    let base_item: item_obj;
-    const items_to_process = [...enchant_objs];
-    let mostExpensiveIdx = 0;
-    items_to_process.forEach((itm, idx) => {
-        if (itm.l > items_to_process[mostExpensiveIdx].l) mostExpensiveIdx = idx;
-    });
-    if (itemType === 'book') {
-        const expensive = items_to_process[mostExpensiveIdx];
-        const id = expensive.e[0];
-        base_item = new item_obj('book', expensive.l, [id], expensive.display);
-        base_item.c = { I: id, l: base_item.l, w: base_item.w };
-        items_to_process.splice(mostExpensiveIdx, 1);
-        if (items_to_process.length > 0) {
-            mostExpensiveIdx = 0;
-            items_to_process.forEach((itm, idx) => {
-                if (itm.l > items_to_process[mostExpensiveIdx].l) mostExpensiveIdx = idx;
-            });
+  // 1. Prepare Base Objects
+  const enchant_objs: item_obj[] = [];
+  
+  enchants.forEach(([name, level]) => {
+    const id = ID_LIST[name];
+    const weight = ENCHANTMENT2WEIGHT[id];
+    const val = level * weight;
+    const display = `Book (${getPrettyName(name)} ${getDisplayLevel(level)})`;
+    const obj = new item_obj('book', val, [id], display);
+    obj.c = { I: id, l: obj.l, w: obj.w };
+    enchant_objs.push(obj);
+  });
+
+  if (enchant_objs.length === 0) return null;
+
+  // 2. Identify Target Item
+  let base_item: item_obj;
+  const isBookOnly = itemType === 'book';
+  let initialItems: item_obj[] = [...enchant_objs];
+
+  if (!isBookOnly) {
+     const formattedItemName = itemType.charAt(0).toUpperCase() + itemType.slice(1).replace(/_/g, ' ');
+     base_item = new item_obj('item', 0, [], formattedItemName);
+     base_item.c = { I: 'item', l: 0, w: 0 };
+     initialItems = [base_item, ...enchant_objs];
+  }
+
+  const N = initialItems.length;
+  // Limit check: if too many enchants, bitmask might overflow (JS bitwise ops are 32-bit).
+  // Minecraft usually has max ~10-15 enchants, so 2^15 is safe for 32-bit int.
+  const LIMIT = 1 << N; 
+
+  // DP State: dp[mask] = Record<WorkPenalty, item_obj>
+  // We keep the best item for each WorkPenalty at this mask.
+  const dp: Array<Record<number, item_obj>> = new Array(LIMIT).fill(null).map(() => ({}));
+
+  // 3. Initialize DP with single items
+  for (let i = 0; i < N; i++) {
+    const mask = 1 << i;
+    const item = initialItems[i];
+    dp[mask][item.w] = item;
+  }
+
+  // 4. Iterate by set size (k)
+  // We only iterate sizes 2 to N.
+  for (let k = 2; k <= N; k++) {
+    // Iterate all masks
+    for (let mask = 0; mask < LIMIT; mask++) {
+      if (countSetBits(mask) !== k) continue;
+
+      // Iterate submasks to split this mask into Left (s) and Right (mask ^ s)
+      // Optimization: We only need to check s where countSetBits(s) is approx k/2
+      // This enforces the "Balanced Tree" strategy which is optimal for Anvil mechanics.
+      
+      const subsetSize = Math.floor(k / 2);
+      
+      // Iterate submasks: s = (s - 1) & mask
+      for (let s = (mask - 1) & mask; s > 0; s = (s - 1) & mask) {
+        
+        // Pruning: Only allow balanced splits. 
+        const sBits = countSetBits(s);
+        // We check if the split is roughly equal (e.g. 5 items -> 2+3, 4 items -> 2+2)
+        // This is crucial for performance and finding optimal tree depth.
+        if (sBits !== subsetSize && sBits !== (k - subsetSize)) continue;
+
+        const other = mask ^ s;
+        if (s > other) continue; // Symmetry check: A+B is same set as B+A
+
+        const leftCandidates = dp[s];
+        const rightCandidates = dp[other];
+
+        if (!leftCandidates || !rightCandidates) continue;
+
+        // Try merging every valid candidate from Left with Right
+        for (const lwStr in leftCandidates) {
+          const leftItem = leftCandidates[lwStr];
+          for (const rwStr in rightCandidates) {
+            const rightItem = rightCandidates[rwStr];
+
+            // Try A + B
+            try {
+              const res = new MergeEnchants(leftItem, rightItem);
+              const existing = dp[mask][res.w];
+              if (!existing || isBetterOrEqual(res, existing)) {
+                dp[mask][res.w] = res;
+              }
+            } catch (e) { /* Too expensive */ }
+
+            // Try B + A (Order matters for cost: target + sacrifice)
+            try {
+              const res = new MergeEnchants(rightItem, leftItem);
+              const existing = dp[mask][res.w];
+              if (!existing || isBetterOrEqual(res, existing)) {
+                dp[mask][res.w] = res;
+              }
+            } catch (e) { /* Too expensive */ }
+          }
         }
-    } else {
-        const formattedItemName = itemType.charAt(0).toUpperCase() + itemType.slice(1).replace(/_/g, ' ');
-        base_item = new item_obj('item', 0, [], formattedItemName);
-        base_item.c = { I: 'item', l: 0, w: 0 };
+      }
     }
-    if (items_to_process.length > 0) {
-        const next_expensive = items_to_process[mostExpensiveIdx];
-        const foundation = new MergeEnchants(base_item, next_expensive);
-        items_to_process.splice(mostExpensiveIdx, 1);
-        items_to_process.push(foundation);
-    } else {
-        items_to_process.push(base_item);
+  }
+
+  // 5. Retrieve result
+  const finalMask = LIMIT - 1;
+  const finalCandidates = dp[finalMask];
+  
+  let best: item_obj | null = null;
+  let min_cost = Infinity;
+
+  for (const w in finalCandidates) {
+    const itm = finalCandidates[w];
+    // Filter: If we are not making a book, the result must preserve the item type
+    // (MergeEnchants logic usually handles this, but safe to check)
+    if (!isBookOnly && itm.i === 'book') continue;
+
+    const cost = mode === 'levels' ? itm.x : itm.w;
+    if (cost < min_cost) {
+      min_cost = cost;
+      best = itm;
     }
-    const cheapest_map = cheapestItemsFromList(items_to_process);
-    let best: item_obj | null = null;
-    let min_cost = Infinity;
-    for (const w in cheapest_map) {
-        const itm = cheapest_map[w];
-        const cost = mode === 'levels' ? itm.x : itm.w;
-        if (cost < min_cost) {
-            min_cost = cost;
-            best = itm;
-        }
-    }
-    if (!best) return null;
-    const instructions = getInstructions(best.c);
-    let totalLevels = 0;
-    instructions.forEach(step => totalLevels += step.cost);
-    return { item: best, instructions, maxLevels: totalLevels, maxXp: best.x };
+  }
+
+  if (!best) return null;
+
+  const instructions = getInstructions(best.c);
+  let totalLevels = 0;
+  instructions.forEach(step => totalLevels += step.cost);
+  
+  return { item: best, instructions, maxLevels: totalLevels, maxXp: best.x };
 }
+
+// --- VIEW COMPONENT ---
 
 const ItemStepRenderer: React.FC<{ text: string }> = ({ text }) => {
-    const isBook = text.startsWith('Book');
-    const match = text.match(/^([^(]+)(?:\((.*)\))?$/);
-    const itemName = match?.[1].trim() || text;
-    const enchantsStr = match?.[2] || '';
-    const enchants = enchantsStr ? enchantsStr.split(',').map(s => s.trim()) : [];
-    return (
-        <div className="flex flex-col gap-1.5 w-full">
-            <div className="flex items-center gap-2">
-                {isBook ? <Book size={16} className="text-blue-400" /> : <Hammer size={16} className="text-amber-500" />}
-                <span className="font-bold text-zinc-100 text-sm tracking-tight">{itemName}</span>
+  const isBook = text.startsWith('Book');
+  const match = text.match(/^([^(]+)(?:\((.*)\))?$/);
+  const itemName = match?.[1].trim() || text;
+  const enchantsStr = match?.[2] || '';
+  const enchants = enchantsStr ? enchantsStr.split(',').map(s => s.trim()) : [];
+  return (
+    <div className="flex flex-col gap-1.5 w-full">
+      <div className="flex items-center gap-2">
+        {isBook ? <Book size={16} className="text-blue-400" /> : <Hammer size={16} className="text-amber-500" />}
+        <span className="font-bold text-zinc-100 text-sm tracking-tight">{itemName}</span>
+      </div>
+      {enchants.length > 0 && (
+        <div className="pl-6 space-y-0.5 border-l border-zinc-800/50 ml-2">
+          {enchants.map((e, idx) => (
+            <div key={idx} className="text-xs text-zinc-400 font-medium flex items-center gap-2">
+              <div className="w-1 h-1 rounded-full bg-zinc-700" />
+              {e}
             </div>
-            {enchants.length > 0 && (
-                <div className="pl-6 space-y-0.5 border-l border-zinc-800/50 ml-2">
-                    {enchants.map((e, idx) => (
-                        <div key={idx} className="text-xs text-zinc-400 font-medium flex items-center gap-2">
-                            <div className="w-1 h-1 rounded-full bg-zinc-700" />
-                            {e}
-                        </div>
-                    ))}
-                </div>
-            )}
+          ))}
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps> = ({ onBack }) => {
@@ -521,6 +495,7 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
   const runSolver = () => {
     if (selectedEnchants.size === 0) return;
     setIsCalculating(true);
+    // Reduced timeout to 50ms as solver is now much faster
     setTimeout(() => {
         const startTime = performance.now();
         try {
@@ -535,7 +510,7 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
         const endTime = performance.now();
         setCalcTime(Math.round(endTime - startTime));
         setIsCalculating(false);
-    }, 10);
+    }, 50);
   };
 
   useEffect(() => {
@@ -545,9 +520,10 @@ export const EnchantmentCalculatorView: React.FC<EnchantmentCalculatorViewProps>
         setIsCalculating(false);
         return;
     }
+    // Faster debounce
     calcTimerRef.current = setTimeout(() => {
         runSolver();
-    }, 400);
+    }, 200);
     return () => { if (calcTimerRef.current) clearTimeout(calcTimerRef.current); };
   }, [selectedEnchants, selectedItemType, optimizationMode]);
 
