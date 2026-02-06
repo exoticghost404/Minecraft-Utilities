@@ -1,6 +1,7 @@
 # Minecraft Utility
 
-<img width="1920" height="1080" alt="Screenshot 2025-12-21 223917" src="https://github.com/user-attachments/assets/809cfdcd-71ed-43ab-b5e0-50d573e53fac" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/697d75e3-cb08-4fb6-81cb-9d51baf57761" />
+
 
 Minecraft Utility is a modern, web-based collection of tools designed to help Minecraft players plan, track, and optimize their gameplay.  
 It focuses on quality-of-life features such as enchantment planning, XP optimization, coordinate conversion, and progress tracking — all in one clean interface.
