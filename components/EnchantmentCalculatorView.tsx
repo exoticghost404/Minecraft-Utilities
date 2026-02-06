@@ -274,14 +274,22 @@ function processCalculation(itemType: string, enchants: [string, number][], mode
   const enchant_objs: item_obj[] = [];
   
   enchants.forEach(([name, level]) => {
-    const id = ID_LIST[name];
-    const weight = ENCHANTMENT2WEIGHT[id];
-    const val = level * weight;
-    const display = `Book (${getPrettyName(name)} ${getDisplayLevel(level)})`;
-    const obj = new item_obj('book', val, [id], display);
-    obj.c = { I: id, l: obj.l, w: obj.w };
-    enchant_objs.push(obj);
-  });
+  const id = ID_LIST[name];
+
+  if (id === undefined) {
+    throw new Error(`Unknown enchantment id: "${name}"`);
+  }
+
+  const weight = ENCHANTMENT2WEIGHT[id];
+  const val = level * weight;
+
+  const display = `Book (${getPrettyName(name)} ${getDisplayLevel(level)})`;
+  const obj = new item_obj('book', val, [id], display);
+  obj.c = { I: id, l: obj.l, w: obj.w };
+
+  enchant_objs.push(obj);
+});
+
 
   if (enchant_objs.length === 0) return null;
 
@@ -304,14 +312,16 @@ function processCalculation(itemType: string, enchants: [string, number][], mode
 
   // DP State: dp[mask] = Record<WorkPenalty, item_obj>
   // We keep the best item for each WorkPenalty at this mask.
-  const dp: Array<Record<number, item_obj>> = new Array(LIMIT).fill(null).map(() => ({}));
+  const dp = new Map<number, Map<number, item_obj>>();
+
 
   // 3. Initialize DP with single items
   for (let i = 0; i < N; i++) {
-    const mask = 1 << i;
-    const item = initialItems[i];
-    dp[mask][item.w] = item;
-  }
+  const mask = 1 << i;
+  const item = initialItems[i];
+  dp.set(mask, new Map([[item.w, item]]));
+}
+
 
   // 4. Iterate by set size (k)
   // We only iterate sizes 2 to N.
@@ -338,34 +348,47 @@ function processCalculation(itemType: string, enchants: [string, number][], mode
         const other = mask ^ s;
         if (s > other) continue; // Symmetry check: A+B is same set as B+A
 
-        const leftCandidates = dp[s];
-        const rightCandidates = dp[other];
+        const leftCandidates = dp.get(s);
+const rightCandidates = dp.get(other);
 
-        if (!leftCandidates || !rightCandidates) continue;
+if (!leftCandidates || !rightCandidates) continue;
 
-        // Try merging every valid candidate from Left with Right
-        for (const lwStr in leftCandidates) {
-          const leftItem = leftCandidates[lwStr];
-          for (const rwStr in rightCandidates) {
-            const rightItem = rightCandidates[rwStr];
+for (const [_, leftItem] of leftCandidates) {
+  for (const [__, rightItem] of rightCandidates) {
+
 
             // Try A + B
             try {
               const res = new MergeEnchants(leftItem, rightItem);
-              const existing = dp[mask][res.w];
-              if (!existing || isBetterOrEqual(res, existing)) {
-                dp[mask][res.w] = res;
-              }
+              let mapForMask = dp.get(mask);
+if (!mapForMask) {
+  mapForMask = new Map();
+  dp.set(mask, mapForMask);
+}
+
+const existing = mapForMask.get(res.w);
+if (!existing || isBetterOrEqual(res, existing)) {
+  mapForMask.set(res.w, res);
+}
+
             } catch (e) { /* Too expensive */ }
 
             // Try B + A (Order matters for cost: target + sacrifice)
-            try {
-              const res = new MergeEnchants(rightItem, leftItem);
-              const existing = dp[mask][res.w];
-              if (!existing || isBetterOrEqual(res, existing)) {
-                dp[mask][res.w] = res;
-              }
-            } catch (e) { /* Too expensive */ }
+try {
+  const res = new MergeEnchants(rightItem, leftItem);
+
+  let mapForMask = dp.get(mask);
+  if (!mapForMask) {
+    mapForMask = new Map();
+    dp.set(mask, mapForMask);
+  }
+
+  const existing = mapForMask.get(res.w);
+  if (!existing || isBetterOrEqual(res, existing)) {
+    mapForMask.set(res.w, res);
+  }
+} catch (e) { /* Too expensive */ }
+
           }
         }
       }
@@ -374,13 +397,14 @@ function processCalculation(itemType: string, enchants: [string, number][], mode
 
   // 5. Retrieve result
   const finalMask = LIMIT - 1;
-  const finalCandidates = dp[finalMask];
-  
+  const finalCandidates = dp.get(finalMask);
+if (!finalCandidates) return null;
+
   let best: item_obj | null = null;
   let min_cost = Infinity;
 
-  for (const w in finalCandidates) {
-    const itm = finalCandidates[w];
+  for (const [_, itm] of finalCandidates) {
+
     // Filter: If we are not making a book, the result must preserve the item type
     // (MergeEnchants logic usually handles this, but safe to check)
     if (!isBookOnly && itm.i === 'book') continue;
