@@ -4,14 +4,14 @@
 
 
 Minecraft Utility is a modern, web-based collection of tools designed to help Minecraft players plan, track, and optimize their gameplay.  
-It focuses on quality-of-life features such as enchantment planning, XP optimization, coordinate conversion, and progress tracking — all in one clean interface.
+It focuses on quality-of-life features such as enchantment planning, XP optimization, Nether coordinate conversion, and progress tracking all in one clean interface.
 
 ---
 
 ## ✨ Features
 
 - **Checklist**
-  - Track collected enchantments and progression
+  - Track collected enchantments from villagers or else and progression
   - Stay organized during survival or long-term worlds
 
 - **Best Enchantments**
@@ -30,7 +30,7 @@ It focuses on quality-of-life features such as enchantment planning, XP optimiza
   - Useful for long-term worlds and projects
 
 - **More Tools**
-  - Brewing Lab and Pixel circle generator 
+  - Native : Brewing Lab and Pixel circle generator 
   - Seed tools, armor trims, banners
   - Command generators and more
 
@@ -48,9 +48,9 @@ Feedback, suggestions, and feature ideas are always welcome!
 
 ---
 
-## 👤 Author
+## 👤 Author 
 
-Created and maintained by **Exoticghost404**
+- Created and maintained by **Exoticghost404**
 
 ---
 
