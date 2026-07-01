@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minecraft Utilities</title>
+  
+  <link rel="manifest" href="manifest.json?v=12" />
+  <meta name="theme-color" content="#000000" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MC Utilities" />
+  <link rel="icon" type="image/png" href="e.png" />
+  <link rel="apple-touch-icon" href="e.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.cdnfonts.com/css/minecraft-4" rel="stylesheet">
+
+  <script>
+    const theme = localStorage.getItem('mcd_theme_v1') || 'modern';
+    if (theme === 'minecraft') {
+      document.documentElement.classList.add('theme-minecraft');
+    }
+  </script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mc: ['"Minecraft"', 'system-ui', 'sans-serif'],
+            mono: ['ui-monospace', 'monospace'],
+            sans: ['"Noto Sans"', 'sans-serif']
+          },
+          colors: {
+            zinc: {
+              950: '#09090b', 900: '#18181b', 800: '#27272a', 700: '#3f3f46',
+              400: '#d4d4d8', 500: '#a1a1aa', 600: '#52525b'
+            },
+            amber: { 400: '#fbbf24', 500: '#f59e0b', 600: '#d97706' }
+          },
+          animation: {
+            'pulse-slow': 'pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'shimmer': 'shimmer 1.5s infinite linear'
+          },
+          keyframes: {
+            'pulse-slow': {
+              '0%, 100%': { opacity: 0.8, transform: 'scale(1)' },
+              '50%': { opacity: 0.4, transform: 'scale(0.98)' }
+            },
+            'shimmer': {
+              '0%': { backgroundPosition: '200% center' },
+              '100%': { backgroundPosition: '-200% center' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+ <style>
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #000000; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+
+    body {
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .font-black, h1, h2, h3, h4, h5, h6 {
+      font-family: "Minecraft", system-ui, sans-serif;
+      font-weight: normal !important;
+      letter-spacing: 0.02em;
+      font-synthesis: none !important; 
+    }
+
+    .font-mc, .font-mc * {
+      font-weight: normal !important;
+      font-synthesis: none !important;
+    }
+
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] { -moz-appearance: textfield; }
+
+    [contenteditable]:empty:before {
+      content: attr(data-placeholder);
+      color: #52525b;
+      pointer-events: none;
+      display: block;
+    }
+    
+    .bg-shimmer {
+      background-image: linear-gradient(90deg, #10b981 0%, #34d399 50%, #10b981 100%);
+      background-size: 200% auto;
+    }
+  </style>
+  <script type="module" crossorigin src="./assets/index-CYLawplv.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/vendor-FJBa6EiW.js">
+  <link rel="modulepreload" crossorigin href="./assets/data-constants--5QpCaIj.js">
+  <link rel="modulepreload" crossorigin href="./assets/data-enchantments-DVODsa2s.js">
+  <link rel="modulepreload" crossorigin href="./assets/data-constants-vanilla-CAu17Na8.js">
+</head>
+<body class="bg-black text-zinc-100 antialiased selection:bg-emerald-500/30 selection:text-emerald-400">
+  
+  <div id="root">
+    <div id="app-loading-screen" class="fixed inset-0 flex flex-col items-center justify-center bg-black font-mc">
+      <div class="flex flex-col items-center max-w-sm px-6 text-center animate-pulse-slow">
+        
+        <div class="relative w-16 h-16 mb-6 flex items-center justify-center bg-zinc-900 border-2 border-emerald-500 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.5)]">
+          <div class="absolute inset-1.5 bg-emerald-500/20 rounded-lg animate-pulse"></div> 
+          <svg class="w-8 h-8 text-emerald-500 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
+          </svg>
+        </div>
+        
+        <h1 class="text-xl font-bold tracking-tight text-white mb-2">Minecraft Utilities</h1>
+        <p class="text-sm text-zinc-400 mb-6 font-medium">Preparing MCUtils...</p>
+        
+        <div class="w-32 h-1 bg-zinc-900 rounded-full overflow-hidden border border-zinc-800">
+          <div class="h-full rounded-full w-1/2 bg-shimmer animate-shimmer"></div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+
+  <script>
+    window.deferredInstallPrompt = null;
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      window.deferredInstallPrompt = e;
+      if (typeof window.onBeforeRestorePrompt === 'function') {
+        window.onBeforeRestorePrompt(e);
+      }
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const isGH = window.location.pathname.startsWith('/Minecraft-Utilities');
+        const basePath = isGH ? '/Minecraft-Utilities/' : '/';
+        
+        navigator.serviceWorker.register(`${basePath}sw.js?v=13`)
+          .then(() => console.log('[SW] Ready'))
+          .catch(err => console.error('[SW] Registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>
